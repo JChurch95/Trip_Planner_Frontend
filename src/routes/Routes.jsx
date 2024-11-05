@@ -1,10 +1,10 @@
 import { Navigate } from 'react-router-dom';
 import Layout from '../pages/Layout';
-import Home from './Home';
-import Itinerary from './Itinerary';
-import Login, { action as loginAction } from './Login';
-import Registration, { action as registrationAction } from './Registration';
-import Error from './Error';
+import Home from '../routes/Home';
+import Itinerary from '../routes/Itinerary';
+import Login, { action as loginAction } from '../routes/Login';
+import Registration, { action as registrationAction } from '../routes/Registration';
+import Error from '../pages/Error';
 import { useAuth } from '../AuthContext';
 
 // Protected Layout wrapper component
@@ -44,7 +44,7 @@ export const publicRoutes = [
         ),
       },
       {
-        path: "/itinerary",
+        path: "/itinerary/:tripId",
         element: (
           <ProtectedLayout>
             <Itinerary />
