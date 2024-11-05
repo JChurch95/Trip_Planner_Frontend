@@ -1,7 +1,9 @@
+console.log('AuthContext.jsx - Start of file');
 import { createContext, useState, useEffect, useContext } from "react";
 import supabase from "./supabase";
 
 const AuthContext = createContext();
+console.log('AuthContext created:', AuthContext);
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
