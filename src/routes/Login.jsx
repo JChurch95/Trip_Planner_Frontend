@@ -1,4 +1,4 @@
-import { Form, useActionData, Navigate } from "react-router-dom";
+import { Form, useActionData, Navigate, Link } from "react-router-dom";
 import { z } from "zod";
 import styles from "./Login.module.css";
 import supabase from "../supabase";
@@ -43,7 +43,6 @@ const Login = () => {
   if (!!data) {
     return <Navigate to="/" replace />;
   }
-  
 
   return (
     <div className={styles.container}>
@@ -89,6 +88,13 @@ const Login = () => {
           >
             Login
           </button>
+
+          <div className={styles.registerPrompt}>
+            <p>Don't have an account yet?</p>
+            <Link to="/registration" className={styles.registerLink}>
+              Create an account
+            </Link>
+          </div>
         </Form>
       </div>
     </div>

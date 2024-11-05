@@ -5,7 +5,7 @@ import styles from './Home.module.css';
 
 export default function Home() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { token } = useAuth();  // Get token directly from AuthContext
   const [formData, setFormData] = useState({
     destination: '',
     start_date: '',
@@ -27,26 +27,51 @@ export default function Home() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
+      if (!token) {
+        console.error('No authentication token available');
+        return;
+      }
+  
+      // Clean the token of any quotes
+      const cleanToken = token.replace(/^['"](.+)['"]$/, '$1');
+      
+      // Log the request details for debugging
+      console.log('Making request with token:', cleanToken);
+  
       const response = await fetch('http://localhost:8000/trips/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user?.access_token}`
+          'Authorization': `Bearer ${cleanToken}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          status: 'pending'
+        })
       });
-
+  
+      // Handle non-ok response
       if (!response.ok) {
-        throw new Error('Failed to create trip');
+        const errorData = await response.json();
+        console.error('Response not ok:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        });
+        return;
       }
-
+  
       const data = await response.json();
-      navigate(`/itinerary/${data.trip.id}`);
+      
+      if (data.trip && data.trip.id) {
+        navigate(`/itinerary/${data.trip.id}`);
+      } else {
+        console.error('Invalid response data:', data);
+      }
     } catch (error) {
       console.error('Error creating trip:', error);
-      // Handle error (show message to user, etc.)
     }
   };
 

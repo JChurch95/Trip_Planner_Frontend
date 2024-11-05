@@ -1,13 +1,12 @@
-console.log('AuthContext.jsx - Start of file');
 import { createContext, useState, useEffect, useContext } from "react";
 import supabase from "./supabase";
 
 const AuthContext = createContext();
-console.log('AuthContext created:', AuthContext);
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const updateSession = (access_token, user_id) => {
     setToken(access_token);
@@ -28,13 +27,32 @@ const AuthProvider = ({ children }) => {
     if (error) {
       console.error("ERROR: ", error);
     }
+    clearSession();
     return { error };
   };
 
   useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    // Initial session check
+    const initSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          updateSession(session.access_token, session.user.id);
+        } else {
+          clearSession();
+        }
+      } catch (error) {
+        console.error("Session initialization error:", error);
+        clearSession();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth event:", event);
       if (session) {
         updateSession(session.access_token, session.user.id);
       }
@@ -48,6 +66,11 @@ const AuthProvider = ({ children }) => {
     };
   }, []);
 
+  // Prevent rendering until initial session check is complete
+  if (loading) {
+    return null;
+  }
+
   return (
     <AuthContext.Provider value={{ user, token, logout }}>
       {children}
@@ -58,5 +81,9 @@ const AuthProvider = ({ children }) => {
 export default AuthProvider;
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };
