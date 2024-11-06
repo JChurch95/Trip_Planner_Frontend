@@ -19,28 +19,47 @@ export const action = async ({ request }) => {
   });
 
   if (!result.success) {
-    console.error(result.error);
+    console.error('Validation error:', result.error);
     return null;
   }
 
   const { email, password } = result.data;
-  console.log("EMAIL AND PASSWORD: ", email, password);
-  console.log("TO BE CONTINUED... ");
+  console.log("Login attempt for email:", email);
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-  console.log("DATA AND ERROR: ", data, error);
+    if (error) {
+      console.error("Login error:", error);
+      return null;
+    }
 
-  return data;
+    console.log("Login successful:", {
+      user: data.user,
+      session: data.session
+    });
+
+    // Store token in sessionStorage immediately after successful login
+    if (data.session?.access_token) {
+      sessionStorage.setItem("sb-access-token", data.session.access_token);
+      console.log("Token stored in session storage:", data.session.access_token);
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Unexpected login error:", error);
+    return null;
+  }
 };
 
 const Login = () => {
   const data = useActionData();
 
   if (!!data) {
+    console.log("Redirecting after successful login");
     return <Navigate to="/" replace />;
   }
 

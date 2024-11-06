@@ -1,0 +1,136 @@
+.container {
+    min-height: 100vh;
+    background-color: black;
+  }
+  
+  .searchContainer {
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  .generateButton {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .generateButton::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(147, 51, 234, 0.1), rgba(59, 130, 246, 0.1));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .generateButton:hover::before {
+    opacity: 1;
+  }
+  
+  .modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  
+  .modalContent {
+    background-color: rgb(17, 24, 39);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 32rem;
+  }
+  
+  .suggestions {
+    position: absolute;
+    width: 100%;
+    margin-top: 0.5rem;
+    background-color: rgb(17, 24, 39);
+    border: 1px solid rgb(31, 41, 55);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  
+  .suggestionItem {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    transition: background-color 0.2s;
+  }
+  
+  .suggestionItem:hover {
+    background-color: rgb(31, 41, 55);
+  }
+
+  /* Add these styles to your existing Home.module.css */
+.calendarWrapper {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 0.5rem;
+    background-color: rgb(17, 24, 39);
+    border: 1px solid rgb(31, 41, 55);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    z-index: 50;
+  }
+  
+  .calendarHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .dayHeader {
+    font-size: 0.875rem;
+    color: #6B7280;
+    padding: 0.5rem;
+  }
+  
+  .calendarDay {
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .calendarDay:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+  
+  .calendarDay.selected {
+    background-color: #3B82F6;
+    color: white;
+  }
+  
+  .calendarDay.today {
+    border: 1px solid #3B82F6;
+  }
+  
+  .calendarDay.disabled {
+    color: #4B5563;
+    cursor: not-allowed;
+  }
+  
+  .navigationButton {
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s;
+  }
+  
+  .navigationButton:hover {
+    background-color: rgba(55, 65, 81, 0.5);
+  }

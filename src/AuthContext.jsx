@@ -9,6 +9,8 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const updateSession = (access_token, user_id) => {
+    console.log('Updating session - Token:', access_token);  // Debug log
+    console.log('Updating session - User:', user_id);       // Debug log
     setToken(access_token);
     setUser(user_id);
     sessionStorage.setItem("sb-access-token", access_token);
@@ -16,6 +18,7 @@ const AuthProvider = ({ children }) => {
   };
 
   const clearSession = () => {
+    console.log('Clearing session');  // Debug log
     setToken(null);
     setUser(null);
     sessionStorage.removeItem("sb-access-token");
@@ -25,7 +28,7 @@ const AuthProvider = ({ children }) => {
   const logout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error("ERROR: ", error);
+      console.error("Logout ERROR: ", error);
     }
     clearSession();
     return { error };
@@ -36,9 +39,15 @@ const AuthProvider = ({ children }) => {
     const initSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        console.log('Initial session check:', session); // Debug log
         if (session) {
+          console.log('Valid session found:', {
+            token: session.access_token,
+            user: session.user
+          });
           updateSession(session.access_token, session.user.id);
         } else {
+          console.log('No valid session found');
           clearSession();
         }
       } catch (error) {
@@ -52,7 +61,8 @@ const AuthProvider = ({ children }) => {
     initSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth event:", event);
+      console.log("Auth event:", event);          // Debug log
+      console.log("Auth session:", session);      // Debug log
       if (session) {
         updateSession(session.access_token, session.user.id);
       }
