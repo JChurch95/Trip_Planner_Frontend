@@ -1,21 +1,31 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../AuthContext';
-import { Search, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
-import styles from './Home.module.css';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthContext";
+import { Search, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import styles from "./Home.module.css";
 
 const SAMPLE_LOCATIONS = [
   "Charlotte",
   "Charlotte, North Carolina, United States",
   "Charlottesville, Virginia, United States",
   "Charlotte Amalie, Saint Thomas, US Virgin Islands",
-  "Charlottetown, Prince Edward Island, Canada"
+  "Charlottetown, Prince Edward Island, Canada",
 ];
 
-const DAYS_OF_WEEK = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const DAYS_OF_WEEK = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 function CalendarDropdown({ onSelect, onClose }) {
@@ -41,15 +51,15 @@ function CalendarDropdown({ onSelect, onClose }) {
         setSelectedEndDate(null);
       } else {
         setSelectedEndDate(date);
-        const formattedStart = selectedStartDate.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric'
+        const formattedStart = selectedStartDate.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
         });
-        const formattedEnd = date.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric'
+        const formattedEnd = date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
         });
         onSelect(`${formattedStart} to ${formattedEnd}`);
         onClose();
@@ -58,7 +68,9 @@ function CalendarDropdown({ onSelect, onClose }) {
   };
 
   const navigateMonth = (direction) => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + direction, 1));
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + direction, 1)
+    );
   };
 
   const renderCalendar = () => {
@@ -76,17 +88,25 @@ function CalendarDropdown({ onSelect, onClose }) {
     // Add the days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
-      const isSelected = selectedStartDate && date.toDateString() === selectedStartDate.toDateString() ||
-                        selectedEndDate && date.toDateString() === selectedEndDate.toDateString();
-      const isInRange = selectedStartDate && selectedEndDate &&
-                       date > selectedStartDate && date < selectedEndDate;
-      
+      const isSelected =
+        (selectedStartDate &&
+          date.toDateString() === selectedStartDate.toDateString()) ||
+        (selectedEndDate &&
+          date.toDateString() === selectedEndDate.toDateString());
+      const isInRange =
+        selectedStartDate &&
+        selectedEndDate &&
+        date > selectedStartDate &&
+        date < selectedEndDate;
+
       days.push(
         <button
           key={day}
           onClick={() => handleDateClick(date)}
-          className={`${styles.calendarDay} ${isSelected ? styles.selected : ''} 
-                     ${isInRange ? styles.inRange : ''}`}
+          className={`${styles.calendarDay} ${
+            isSelected ? styles.selected : ""
+          } 
+                     ${isInRange ? styles.inRange : ""}`}
         >
           {day}
         </button>
@@ -97,7 +117,10 @@ function CalendarDropdown({ onSelect, onClose }) {
   };
 
   return (
-    <div className={styles.calendarWrapper} onClick={e => e.stopPropagation()}>
+    <div
+      className={styles.calendarWrapper}
+      onClick={(e) => e.stopPropagation()}
+    >
       <div className={styles.calendarHeader}>
         <button
           onClick={() => navigateMonth(-1)}
@@ -116,7 +139,7 @@ function CalendarDropdown({ onSelect, onClose }) {
         </button>
       </div>
       <div className={styles.calendarGrid}>
-        {DAYS_OF_WEEK.map(day => (
+        {DAYS_OF_WEEK.map((day) => (
           <div key={day} className={styles.dayHeader}>
             {day}
           </div>
@@ -127,95 +150,98 @@ function CalendarDropdown({ onSelect, onClose }) {
   );
 }
 
-
 export default function Home() {
-    const navigate = useNavigate();
-    const { token } = useAuth();
-    const [showLocations, setShowLocations] = useState(false);
-    const [showCalendar, setShowCalendar] = useState(false);
-    const [showDetailsModal, setShowDetailsModal] = useState(false);
-    const [searchText, setSearchText] = useState('');
-    const [dateRange, setDateRange] = useState('');
-    const [formData, setFormData] = useState({
-      destination: '',
-      arrival_time: '',
-      additional_notes: ''
-    });
-  
-    const filteredLocations = SAMPLE_LOCATIONS.filter(loc => 
-      loc.toLowerCase().includes(searchText.toLowerCase())
-    );
-  
-    const handleLocationSelect = (location) => {
-      setSearchText(location);
-      setFormData(prev => ({ ...prev, destination: location }));
-      setShowLocations(false);
-    };
-  
-    const handleGenerateClick = () => {
-      if (searchText && dateRange) {
-        setShowDetailsModal(true);
-      }
-    };
-  
-    const handleDateSelect = (range) => {
-      setDateRange(range);
-      setShowCalendar(false);
-    };
-const handleFormSubmit = async () => {
-    if (!token) {
-        console.error('No authentication token found');
-        return;
+  const navigate = useNavigate();
+  const { user, token } = useAuth();
+  const [showLocations, setShowLocations] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [dateRange, setDateRange] = useState("");
+  const [formData, setFormData] = useState({
+    destination: "",
+    arrival_time: "",
+    additional_notes: "",
+  });
+
+  const handleFormSubmit = async () => {
+    // Get token and user ID directly from the useAuth hook
+    if (!token || !user) {
+      console.error("No authentication token or user found");
+      return;
     }
 
     if (!searchText || !dateRange) {
-        console.error('Missing required fields');
-        return;
+      console.error("Missing required fields");
+      return;
     }
 
-    const [startStr, endStr] = dateRange.split(' to ');
-    const start_date = new Date(startStr).toISOString().split('T')[0];
-    const end_date = new Date(endStr).toISOString().split('T')[0];
+    const [startStr, endStr] = dateRange.split(" to ");
+    const start_date = new Date(startStr).toISOString().split("T")[0];
+    const end_date = new Date(endStr).toISOString().split("T")[0];
 
     const tripData = {
-        destination: searchText,
-        start_date,
-        end_date,
-        arrival_time: formData.arrival_time || '',
-        additional_notes: formData.additional_notes || '',
-        status: 'pending'
-        // Removed any ID field to let database auto-increment
+      user_id: user, // This will be overridden by the backend
+      destination: searchText,
+      start_date,
+      end_date,
+      arrival_time: formData.arrival_time || "",
+      additional_notes: formData.additional_notes || "",
+      status: "pending",
     };
 
     try {
-        const response = await fetch('http://localhost:8000/trips/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(tripData)
-        });
+      console.log("Sending request with token:", token);
+      const response = await fetch("http://localhost:8000/trips/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify(tripData),
+      });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Server error:", errorData);
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      }
 
-        const data = await response.json();
-        setShowDetailsModal(false);
-        navigate(`/itinerary/${data.trip.id}`);
-
+      const data = await response.json();
+      setShowDetailsModal(false);
+      navigate(`/itinerary/${data.trip.id}`);
     } catch (error) {
-        console.error('Error creating trip:', error);
+      console.error("Error creating trip:", error);
     }
-};
+  };
+
+  const filteredLocations = SAMPLE_LOCATIONS.filter((loc) =>
+    loc.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  const handleLocationSelect = (location) => {
+    setSearchText(location);
+    setFormData((prev) => ({ ...prev, destination: location }));
+    setShowLocations(false);
+  };
+
+  const handleGenerateClick = () => {
+    if (searchText && dateRange) {
+      setShowDetailsModal(true);
+    }
+  };
+
+  const handleDateSelect = (range) => {
+    setDateRange(range);
+    setShowCalendar(false);
+  };
 
   return (
     <div className={`${styles.container} py-16 text-white`}>
       {/* Main Title */}
       <h1 className="text-4xl md:text-5xl font-bold text-center max-w-3xl mx-auto mb-16 px-4 leading-tight">
-        Simplify your trip planning with<br />
+        Simplify your trip planning with
+        <br />
         AI powered itineraries
       </h1>
 
@@ -224,7 +250,10 @@ const handleFormSubmit = async () => {
         <div className="flex flex-col md:flex-row gap-4">
           {/* Location Search */}
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <Search
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              size={20}
+            />
             <input
               type="text"
               value={searchText}
@@ -236,7 +265,7 @@ const handleFormSubmit = async () => {
               placeholder="Where?"
               className="w-full bg-gray-900/50 border border-gray-800 rounded-lg py-3 px-12 text-white placeholder-gray-400 focus:outline-none focus:border-gray-700"
             />
-            
+
             {showLocations && searchText && (
               <div className={styles.suggestions}>
                 {filteredLocations.map((location) => (
@@ -254,7 +283,10 @@ const handleFormSubmit = async () => {
 
           {/* Date Input */}
           <div className="relative flex-1">
-            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <Calendar
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              size={20}
+            />
             <input
               type="text"
               value={dateRange}
@@ -286,11 +318,15 @@ const handleFormSubmit = async () => {
         <div className={styles.modal}>
           <div className={styles.modalContent}>
             <h2 className="text-xl font-semibold mb-2">
-              Additional details? <span className="text-gray-400 text-sm font-normal">Optional</span>
+              Additional details?{" "}
+              <span className="text-gray-400 text-sm font-normal">
+                Optional
+              </span>
             </h2>
             <p className="text-gray-400 text-sm mb-6">
-              While we are generating your itinerary, let us know more about your trip - dietary preferences, existing
-              plans, places you want to make sure to cover, etc.
+              While we are generating your itinerary, let us know more about
+              your trip - dietary preferences, existing plans, places you want
+              to make sure to cover, etc.
             </p>
 
             <div className="space-y-4">
@@ -301,7 +337,12 @@ const handleFormSubmit = async () => {
                 <input
                   type="text"
                   value={formData.arrival_time}
-                  onChange={(e) => setFormData(prev => ({ ...prev, arrival_time: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      arrival_time: e.target.value,
+                    }))
+                  }
                   placeholder="Flying in late thursday night..."
                   className="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600"
                 />
@@ -313,7 +354,12 @@ const handleFormSubmit = async () => {
                 </label>
                 <textarea
                   value={formData.additional_notes}
-                  onChange={(e) => setFormData(prev => ({ ...prev, additional_notes: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      additional_notes: e.target.value,
+                    }))
+                  }
                   placeholder="I am vegetarian. I want to make sure to visit the Eiffel Tower. I am traveling with my wife and 2 kids."
                   className="w-full h-32 bg-gray-800/50 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 resize-none focus:outline-none focus:border-gray-600"
                 />
