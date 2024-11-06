@@ -162,53 +162,54 @@ export default function Home() {
       setDateRange(range);
       setShowCalendar(false);
     };
-  
-    const handleFormSubmit = async () => {
-        console.log('Form submit triggered', { searchText, dateRange, formData, token });
-      
-        if (!searchText || !dateRange) {
-          console.log('Missing required fields');
-          return;
-        }
-      
-        // Parse the date range
-        const [startStr, endStr] = dateRange.split(' to ');
-        const start_date = new Date(startStr).toISOString().split('T')[0];
-        const end_date = new Date(endStr).toISOString().split('T')[0];
-      
-        try {
-          console.log('Making request with token:', token);
-          const response = await fetch('http://localhost:8000/trips/create', {
+const handleFormSubmit = async () => {
+    if (!token) {
+        console.error('No authentication token found');
+        return;
+    }
+
+    if (!searchText || !dateRange) {
+        console.error('Missing required fields');
+        return;
+    }
+
+    const [startStr, endStr] = dateRange.split(' to ');
+    const start_date = new Date(startStr).toISOString().split('T')[0];
+    const end_date = new Date(endStr).toISOString().split('T')[0];
+
+    const tripData = {
+        destination: searchText,
+        start_date,
+        end_date,
+        arrival_time: formData.arrival_time || '',
+        additional_notes: formData.additional_notes || '',
+        status: 'pending'
+        // Removed any ID field to let database auto-increment
+    };
+
+    try {
+        const response = await fetch('http://localhost:8000/trips/create', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({
-              destination: searchText,
-              start_date,
-              end_date,
-              arrival_time: formData.arrival_time || '',
-              additional_notes: formData.additional_notes || '',
-              status: 'pending'
-            })
-          });
-      
-          if (!response.ok) {
+            body: JSON.stringify(tripData)
+        });
+
+        if (!response.ok) {
             const errorData = await response.json();
-            console.error('Server error:', errorData);
-            throw new Error(errorData.detail || 'Failed to create trip');
-          }
-      
-          const data = await response.json();
-          setShowDetailsModal(false);
-          navigate(`/itinerary/${data.trip.id}`);
-      
-        } catch (error) {
-          console.error('Error creating trip:', error);
-          // You might want to show an error message to the user here
+            throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
         }
-      };
+
+        const data = await response.json();
+        setShowDetailsModal(false);
+        navigate(`/itinerary/${data.trip.id}`);
+
+    } catch (error) {
+        console.error('Error creating trip:', error);
+    }
+};
 
   return (
     <div className={`${styles.container} py-16 text-white`}>
