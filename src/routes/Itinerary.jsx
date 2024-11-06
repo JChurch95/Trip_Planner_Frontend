@@ -5,17 +5,19 @@ import styles from './Itinerary.module.css';
 
 export default function Itinerary() {
   const { tripId } = useParams();
-  const { user } = useAuth();
+  const { user} = useAuth();
   const [tripData, setTripData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const accessToken = sessionStorage.getItem('sb-access-token');
 
   useEffect(() => {
     const fetchTripData = async () => {
       try {
         const response = await fetch(`http://localhost:8000/trips/${tripId}`, {
           headers: {
-            'Authorization': `Bearer ${user?.access_token}`
+            'Authorization': `Bearer ${accessToken}`
           }
         });
 
