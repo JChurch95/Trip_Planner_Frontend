@@ -161,37 +161,46 @@ export default function Home() {
   const [formData, setFormData] = useState({
     destination: "",
     arrival_time: "",
+    departure_time: "",
+    dietary_preferences: "",
+    activity_preferences: "",
     additional_notes: "",
   });
 
   const handleFormSubmit = async () => {
-    // Get token and user ID directly from the useAuth hook
+    // Basic validation
     if (!token || !user) {
       console.error("No authentication token or user found");
       return;
     }
-
+  
     if (!searchText || !dateRange) {
       console.error("Missing required fields");
       return;
     }
-
+  
+    // Parse dates to match backend expectations
     const [startStr, endStr] = dateRange.split(" to ");
     const start_date = new Date(startStr).toISOString().split("T")[0];
     const end_date = new Date(endStr).toISOString().split("T")[0];
-
+  
+    // Define tripData before using it
     const tripData = {
-      user_id: user, // This will be overridden by the backend
+      user_id: user,
       destination: searchText,
-      start_date,
-      end_date,
-      arrival_time: formData.arrival_time || "",
-      additional_notes: formData.additional_notes || "",
-      status: "pending",
+      start_date: start_date,
+      end_date: end_date,
+      arrival_time: formData.arrival_time || null,
+      departure_time: formData.departure_time || null,
+      dietary_preferences: formData.dietary_preferences || null,
+      activity_preferences: formData.activity_preferences || null,
+      additional_notes: formData.additional_notes || null,
+      status: "pending"
     };
-
+  
     try {
-      console.log("Sending request with token:", token);
+      console.log("Sending trip data:", tripData);
+      
       const response = await fetch("http://localhost:8000/trips/create", {
         method: "POST",
         headers: {
@@ -200,17 +209,44 @@ export default function Home() {
         },
         body: JSON.stringify(tripData),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Server error:", errorData);
-        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+  
+      const responseText = await response.text();
+      console.log("Raw response:", responseText);
+  
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error("Failed to parse response:", e);
+        throw new Error("Invalid response format from server");
       }
-
-      const data = await response.json();
-      console.log("Trip created successfully:", data);
-      setShowDetailsModal(false);
-      navigate(`/itinerary/${data.trip.id}`);
+  
+      console.log("Complete server response:", data);
+  
+      if (!response.ok) {
+        throw new Error(data.detail || `HTTP error! status: ${response.status}`);
+      }
+  
+      // Get all trips after successful creation
+      const tripsResponse = await fetch("http://localhost:8000/trips/", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        }
+      });
+  
+      const tripsData = await tripsResponse.json();
+      console.log("All trips:", tripsData);
+  
+      // Get the most recently created trip (should be the last one)
+      if (tripsData && tripsData.length > 0) {
+        const mostRecentTrip = tripsData[tripsData.length - 1];
+        console.log("Most recent trip:", mostRecentTrip);
+        setShowDetailsModal(false);
+        navigate(`/itinerary/${mostRecentTrip.id}`);
+      } else {
+        throw new Error('No trips found after creation');
+      }
+  
     } catch (error) {
       console.error("Error creating trip:", error);
     }
