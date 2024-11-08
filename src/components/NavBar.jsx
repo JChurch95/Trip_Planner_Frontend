@@ -3,7 +3,7 @@ import styles from "./NavBar.module.css";
 import { useAuth } from "../AuthContext";
 
 const NavBar = () => {
-    console.log('NavBar component being initialized');
+  console.log("NavBar component being initialized");
   const { user, token, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -35,9 +35,15 @@ const NavBar = () => {
                   Plan Trip
                 </Link>
               </li>
+
               <li>
-                <Link to="/itinerary" className={styles.navLink}>
-                  My Itinerary
+                <Link to="/my-trips" className={styles.navLink}>
+                  My Trips
+                </Link>
+              </li>
+              <li>
+                <Link to="/profile" className={styles.navLink}>
+                  Profile
                 </Link>
               </li>
               <li>
@@ -53,6 +59,6 @@ const NavBar = () => {
   );
 };
 
-console.log('NavBar component:', NavBar);
+console.log("NavBar component:", NavBar);
 export default NavBar;
-console.log('NavBar.jsx - After export');
+console.log("NavBar.jsx - After export");

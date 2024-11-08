@@ -2,6 +2,8 @@ import { Navigate } from 'react-router-dom';
 import Layout from '../pages/Layout';
 import Home from '../routes/Home';
 import Itinerary from '../routes/Itinerary';
+import UserProfile from '../routes/Profile';
+import MyTrips from '../routes/MyTrips';
 import Login, { action as loginAction } from '../routes/Login';
 import Registration, { action as registrationAction } from '../routes/Registration';
 import Error from '../pages/Error';
@@ -44,10 +46,26 @@ export const publicRoutes = [
         ),
       },
       {
+        path: "/my-trips",
+        element: (
+          <ProtectedLayout>
+            <MyTrips />
+          </ProtectedLayout>
+        ),
+      },
+      {
         path: "/itinerary/:tripId",
         element: (
           <ProtectedLayout>
             <Itinerary />
+          </ProtectedLayout>
+        ),
+      },
+      {
+        path: "/profile",
+        element: (
+          <ProtectedLayout>
+            <UserProfile />
           </ProtectedLayout>
         ),
       },
