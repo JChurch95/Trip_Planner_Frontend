@@ -1,38 +1,67 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../AuthContext';
-import { Calendar, MapPin } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../AuthContext";
+import { Calendar, MapPin, Star, RefreshCw } from "lucide-react";
+import DeleteTripButton from "../components/DeleteTripButton";
+import FavoriteButton from "../components/FavoriteButton";
 
 export default function MyTrips() {
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showUnpublished, setShowUnpublished] = useState(false);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const { token } = useAuth();
 
-  useEffect(() => {
-    const fetchTrips = async () => {
-      try {
-        const response = await fetch('http://localhost:8000/trips/', {
+  const fetchTrips = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/trips/?show_unpublished=${showUnpublished}&favorites_only=${showFavoritesOnly}`,
+        {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch trips');
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
 
-        const data = await response.json();
-        setTrips(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch trips");
       }
-    };
 
+      const data = await response.json();
+      setTrips(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchTrips();
-  }, [token]);
+  }, [token, showUnpublished, showFavoritesOnly]);
+
+  const togglePublished = async (tripId, currentStatus) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/trips/${tripId}/publish`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ publish: !currentStatus }),
+        }
+      );
+
+      if (response.ok) {
+        await fetchTrips();
+      }
+    } catch (error) {
+      console.error("Error toggling trip status:", error);
+    }
+  };
 
   if (loading) {
     return (
@@ -45,7 +74,7 @@ export default function MyTrips() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-lg text-red-600">{error}</div>
+        <div className="text-lg text-red-600">Error: {error}</div>
       </div>
     );
   }
@@ -53,49 +82,96 @@ export default function MyTrips() {
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">My Trips</h1>
-        
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">My Trips</h1>
+
+          <div className="flex gap-4">
+            <button
+              onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+              className={`flex items-center px-4 py-2 rounded-md ${
+                showFavoritesOnly
+                  ? "bg-yellow-500 text-white"
+                  : "bg-white text-gray-700"
+              }`}
+            >
+              <Star className="w-4 h-4 mr-2" />
+              Favorites
+            </button>
+
+            <button
+              onClick={() => setShowUnpublished(!showUnpublished)}
+              className={`flex items-center px-4 py-2 rounded-md ${
+                showUnpublished
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-gray-700"
+              }`}
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Show Deleted
+            </button>
+          </div>
+        </div>
+
         {trips.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg mb-4">You haven't planned any trips yet.</p>
-            <Link 
+            <p className="text-gray-500 text-lg mb-4">No trips found.</p>
+            <Link
               to="/"
               className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
             >
-              Plan Your First Trip
+              Plan a New Trip
             </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {trips.map((trip) => (
-              <Link
+              <div
                 key={trip.id}
-                to={`/itinerary/${trip.id}`}
-                className="block bg-white rounded-lg shadow hover:shadow-lg transition-shadow duration-200"
+                className={`relative bg-white rounded-lg shadow transition-all duration-200 ${
+                  !trip.is_published ? "opacity-75" : ""
+                }`}
               >
+                <FavoriteButton
+                  tripId={trip.id}
+                  initialFavorite={trip.is_favorite}
+                  onSuccess={fetchTrips}
+                />
+
                 <div className="p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">
                     {trip.destination}
                   </h2>
+
                   <div className="space-y-2">
                     <div className="flex items-center text-gray-600">
                       <Calendar className="w-4 h-4 mr-2" />
                       <span>
-                        {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
+                        {new Date(trip.start_date).toLocaleDateString()} -{" "}
+                        {new Date(trip.end_date).toLocaleDateString()}
                       </span>
                     </div>
+
                     <div className="flex items-center text-gray-600">
                       <MapPin className="w-4 h-4 mr-2" />
                       <span>{trip.destination}</span>
                     </div>
                   </div>
-                  <div className="mt-4 flex justify-end">
-                    <span className="text-indigo-600 hover:text-indigo-500">
+
+                  <div className="mt-4 flex justify-between items-center">
+                    <Link
+                      to={`/itinerary/${trip.id}`}
+                      className="text-indigo-600 hover:text-indigo-500"
+                    >
                       View Itinerary →
-                    </span>
+                    </Link>
+
+                    <DeleteTripButton
+                      tripId={trip.id}
+                      onSuccess={() => fetchTrips()}
+                    />
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}

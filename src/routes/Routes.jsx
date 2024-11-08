@@ -1,12 +1,18 @@
 import { Navigate } from 'react-router-dom';
+
+// Page Layouts
 import Layout from '../pages/Layout';
+import Error from '../pages/Error';
+
+// Route Components
 import Home from '../routes/Home';
 import Itinerary from '../routes/Itinerary';
 import UserProfile from '../routes/Profile';
 import MyTrips from '../routes/MyTrips';
 import Login, { action as loginAction } from '../routes/Login';
 import Registration, { action as registrationAction } from '../routes/Registration';
-import Error from '../pages/Error';
+
+// Context and Utilities
 import { useAuth } from '../AuthContext';
 
 // Protected Layout wrapper component

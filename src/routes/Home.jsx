@@ -117,10 +117,7 @@ function CalendarDropdown({ onSelect, onClose }) {
   };
 
   return (
-    <div
-      className={styles.calendarWrapper}
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div className={styles.calendarWrapper} onClick={(e) => e.stopPropagation()}>
       <div className={styles.calendarHeader}>
         <button
           onClick={() => navigateMonth(-1)}
@@ -153,6 +150,7 @@ function CalendarDropdown({ onSelect, onClose }) {
 export default function Home() {
   const navigate = useNavigate();
   const { user, token } = useAuth();
+  const [isCreatingTrip, setIsCreatingTrip] = useState(false);
   const [showLocations, setShowLocations] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -168,87 +166,70 @@ export default function Home() {
   });
 
   const handleFormSubmit = async () => {
-    // Basic validation
-    if (!token || !user) {
-      console.error("No authentication token or user found");
-      return;
-    }
-  
-    if (!searchText || !dateRange) {
-      console.error("Missing required fields");
-      return;
-    }
-  
-    // Parse dates to match backend expectations
-    const [startStr, endStr] = dateRange.split(" to ");
-    const start_date = new Date(startStr).toISOString().split("T")[0];
-    const end_date = new Date(endStr).toISOString().split("T")[0];
-  
-    // Define tripData before using it
-    const tripData = {
-      user_id: user,
-      destination: searchText,
-      start_date: start_date,
-      end_date: end_date,
-      arrival_time: formData.arrival_time || null,
-      departure_time: formData.departure_time || null,
-      dietary_preferences: formData.dietary_preferences || null,
-      activity_preferences: formData.activity_preferences || null,
-      additional_notes: formData.additional_notes || null,
-      status: "pending"
-    };
-  
+    setIsCreatingTrip(true);
+
     try {
-      console.log("Sending trip data:", tripData);
-      
+      if (!token || !user) {
+        console.error("No authentication token or user found");
+        return;
+      }
+
+      if (!searchText || !dateRange) {
+        console.error("Missing required fields");
+        return;
+      }
+
+      const [startStr, endStr] = dateRange.split(" to ");
+      const start_date = new Date(startStr).toISOString().split("T")[0];
+      const end_date = new Date(endStr).toISOString().split("T")[0];
+
+      const tripData = {
+        user_id: user,
+        destination: searchText,
+        start_date: start_date,
+        end_date: end_date,
+        arrival_time: formData.arrival_time || null,
+        departure_time: formData.departure_time || null,
+        dietary_preferences: formData.dietary_preferences || null,
+        activity_preferences: formData.activity_preferences || null,
+        additional_notes: formData.additional_notes || null,
+        status: "pending",
+        is_published: true,
+        is_favorite: false,
+      };
+
       const response = await fetch("http://localhost:8000/trips/create", {
         method: "POST",
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(tripData),
       });
-  
-      const responseText = await response.text();
-      console.log("Raw response:", responseText);
-  
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (e) {
-        console.error("Failed to parse response:", e);
-        throw new Error("Invalid response format from server");
-      }
-  
-      console.log("Complete server response:", data);
-  
+
       if (!response.ok) {
-        throw new Error(data.detail || `HTTP error! status: ${response.status}`);
+        throw new Error(`Failed to create trip: ${await response.text()}`);
       }
-  
-      // Get all trips after successful creation
-      const tripsResponse = await fetch("http://localhost:8000/trips/", {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        }
-      });
-  
-      const tripsData = await tripsResponse.json();
-      console.log("All trips:", tripsData);
-  
-      // Get the most recently created trip (should be the last one)
-      if (tripsData && tripsData.length > 0) {
-        const mostRecentTrip = tripsData[tripsData.length - 1];
-        console.log("Most recent trip:", mostRecentTrip);
+
+      const data = await response.json();
+      console.log("Full response data:", data);
+
+      if (data && data.message && data.trip) {
+        console.log("Trip ID:", data.trip.id);
         setShowDetailsModal(false);
-        navigate(`/itinerary/${mostRecentTrip.id}`);
+        setTimeout(() => {
+          navigate(`/itinerary/${data.trip.id}`);
+        }, 1000);
       } else {
-        throw new Error('No trips found after creation');
+        console.error(
+          "Unexpected response format. Expected: { message, trip }, Received:",
+          data
+        );
       }
-  
     } catch (error) {
       console.error("Error creating trip:", error);
+    } finally {
+      setIsCreatingTrip(false);
     }
   };
 
@@ -356,14 +337,12 @@ export default function Home() {
           <div className={styles.modalContent}>
             <h2 className="text-xl font-semibold mb-2">
               Additional details?{" "}
-              <span className="text-gray-400 text-sm font-normal">
-                Optional
-              </span>
+              <span className="text-gray-400 text-sm font-normal">Optional</span>
             </h2>
             <p className="text-gray-400 text-sm mb-6">
-              While we are generating your itinerary, let us know more about
-              your trip - dietary preferences, existing plans, places you want
-              to make sure to cover, etc.
+              While we are generating your itinerary, let us know more about your
+              trip - dietary preferences, existing plans, places you want to make
+              sure to cover, etc.
             </p>
 
             <div className="space-y-4">
@@ -405,9 +384,19 @@ export default function Home() {
               <button
                 onClick={handleFormSubmit}
                 type="button"
-                className="w-full bg-white text-gray-900 rounded-lg py-3 font-medium hover:bg-gray-100 transition-colors"
+                disabled={isCreatingTrip}
+                className={`w-full bg-white text-gray-900 rounded-lg py-3 font-medium hover:bg-gray-100 transition-colors ${
+                  isCreatingTrip ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                Generate!
+                {isCreatingTrip ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin mr-2 h-5 w-5 border-t-2 border-b-2 border-gray-900 rounded-full" />
+                    Creating your trip...
+                  </div>
+                ) : (
+                  'Generate!'
+                )}
               </button>
             </div>
           </div>
