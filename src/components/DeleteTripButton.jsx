@@ -9,8 +9,8 @@ const DeleteTripButton = ({ tripId, onSuccess }) => {
     const token = sessionStorage.getItem('sb-access-token');
 
     try {
-      const response = await fetch(`http://localhost:8000/trips/${tripId}`, {
-        method: 'DELETE',
+      const response = await fetch(`http://localhost:8000/trips/${tripId}/publish?publish=false`, {
+        method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

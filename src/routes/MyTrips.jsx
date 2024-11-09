@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { Calendar, MapPin, Star, RefreshCw } from "lucide-react";
 import DeleteTripButton from "../components/DeleteTripButton";
+import RecoverTripButton from "../components/RecoverTripButton";
 import FavoriteButton from "../components/FavoriteButton";
 
 export default function MyTrips() {
@@ -15,14 +16,15 @@ export default function MyTrips() {
 
   const fetchTrips = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/trips/?show_unpublished=${showUnpublished}&favorites_only=${showFavoritesOnly}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const url = new URL('http://localhost:8000/trips/');
+      url.searchParams.set('show_unpublished', showUnpublished);
+      url.searchParams.set('favorites_only', showFavoritesOnly);
+
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch trips");
@@ -40,28 +42,6 @@ export default function MyTrips() {
   useEffect(() => {
     fetchTrips();
   }, [token, showUnpublished, showFavoritesOnly]);
-
-  const togglePublished = async (tripId, currentStatus) => {
-    try {
-      const response = await fetch(
-        `http://localhost:8000/trips/${tripId}/publish`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ publish: !currentStatus }),
-        }
-      );
-
-      if (response.ok) {
-        await fetchTrips();
-      }
-    } catch (error) {
-      console.error("Error toggling trip status:", error);
-    }
-  };
 
   if (loading) {
     return (
@@ -107,7 +87,7 @@ export default function MyTrips() {
               }`}
             >
               <RefreshCw className="w-4 h-4 mr-2" />
-              Show Deleted
+              {showUnpublished ? "Hide Deleted" : "Show Deleted"}
             </button>
           </div>
         </div>
@@ -165,10 +145,17 @@ export default function MyTrips() {
                       View Itinerary →
                     </Link>
 
-                    <DeleteTripButton
-                      tripId={trip.id}
-                      onSuccess={() => fetchTrips()}
-                    />
+                    {trip.is_published ? (
+                      <DeleteTripButton
+                        tripId={trip.id}
+                        onSuccess={fetchTrips}
+                      />
+                    ) : (
+                      <RecoverTripButton
+                        tripId={trip.id}
+                        onSuccess={fetchTrips}
+                      />
+                    )}
                   </div>
                 </div>
               </div>
