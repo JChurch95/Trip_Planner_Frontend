@@ -15,29 +15,46 @@ export default function MyTrips() {
   const { token } = useAuth();
 
   const fetchTrips = async () => {
-    try {
-      const url = new URL('http://localhost:8000/trips/');
-      url.searchParams.set('show_unpublished', showUnpublished);
-      url.searchParams.set('favorites_only', showFavoritesOnly);
+  try {
+    // Log for debugging
+    console.log('Token:', token);
+    
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    console.log('Base URL:', baseUrl);
+    
+    const url = new URL(`${baseUrl}/trips`); // Remove trailing slash
+    url.searchParams.set('show_unpublished', showUnpublished);
+    url.searchParams.set('favorites_only', showFavoritesOnly);
+    
+    console.log('Fetching from:', url.toString());
 
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include'
+    });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch trips");
-      }
-
-      const data = await response.json();
-      setTrips(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    console.log('Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
+      throw new Error(`Failed to fetch trips: ${response.status}`);
     }
-  };
+
+    const data = await response.json();
+    console.log('Received data:', data);
+    setTrips(data);
+  } catch (err) {
+    console.error('Fetch error:', err);
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchTrips();
