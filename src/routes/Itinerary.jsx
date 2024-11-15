@@ -81,12 +81,27 @@ const ActivityCard = ({ activity, time, icon: Icon }) => (
       </div>
     </div>
     <p className="text-gray-600 text-sm">{activity.description}</p>
-    {activity.rating && (
-      <div className="mt-2 flex items-center text-gray-500">
-        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-        <span className="ml-1 text-sm">{activity.rating}</span>
-      </div>
-    )}
+    
+    <div className="flex items-center justify-between">
+      {activity.rating && (
+        <div className="mt-2 flex items-center text-gray-500">
+          <Star className="w-4 h-4 text-yellow-400 fill-current" />
+          <span className="ml-1 text-sm">{activity.rating}</span>
+        </div>
+      )}
+      
+      {activity.url && (
+        <a 
+          href={activity.url} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-700 font-medium flex items-center"
+        >
+          View Details
+          <ArrowRight className="w-4 h-4 ml-1" />
+        </a>
+      )}
+    </div>
   </div>
 );
 
