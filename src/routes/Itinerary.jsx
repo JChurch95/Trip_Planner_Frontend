@@ -5,39 +5,88 @@ import {
   Calendar, 
   MapPin, 
   Star,
-  AlertTriangle
+  Clock,
+  AlertTriangle,
+  Building,
+  ArrowRight,
+  Coffee,
+  Utensils,
+  Sunset
 } from 'lucide-react';
+import styles from './Itinerary.module.css';
 
-// Helper function to parse daily schedule
-const parseDailySchedule = (schedule) => {
-  if (typeof schedule === 'string') {
-    try {
-      return JSON.parse(schedule);
-    } catch (e) {
-      console.error('Failed to parse daily schedule:', e);
-      return [];
-    }
-  }
-  return Array.isArray(schedule) ? schedule : [];
-};
+const LoadingState = () => (
+  <div className={styles.loadingState}>
+    <div className={styles.spinner} />
+    <p className="mt-4 text-gray-600">Loading your itinerary...</p>
+  </div>
+);
 
 const EmptyState = () => (
-  <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg">
+  <div className={styles.emptyState}>
     <AlertTriangle className="w-12 h-12 text-gray-400 mb-4" />
     <p className="text-gray-600">No itinerary details available</p>
   </div>
 );
 
-const LoadingState = () => (
-  <div className="flex justify-center items-center min-h-[400px]">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+const ErrorState = ({ message }) => (
+  <div className={styles.errorState}>
+    <AlertTriangle className="w-12 h-12 text-red-400 mb-4" />
+    <p className="text-red-600">{message}</p>
   </div>
 );
 
-const ErrorState = ({ message }) => (
-  <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-lg">
-    <AlertTriangle className="w-12 h-12 text-red-400 mb-4" />
-    <p className="text-red-600">{message}</p>
+const AccommodationCard = ({ hotel }) => (
+  <div className={styles.accommodationCard}>
+    <div className={styles.cardHeader}>
+      <div className="flex justify-between items-start mb-4">
+        <h3 className="text-xl font-semibold text-gray-900">{hotel.name}</h3>
+        <div className={styles.rating}>
+          <Star className="w-4 h-4 mr-1" />
+          <span>{hotel.rating}</span>
+        </div>
+      </div>
+      <div className="flex items-start text-gray-600 mb-3">
+        <MapPin className="w-5 h-5 mr-2 flex-shrink-0" />
+        <p>{hotel.location}</p>
+      </div>
+      <p className="text-gray-600 mb-4">{hotel.description}</p>
+      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="text-gray-600">
+          <span className="font-semibold text-gray-900">${hotel.nightly_rate}</span> / night
+        </div>
+        <a 
+          href={hotel.url} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-700 font-medium flex items-center"
+        >
+          View Details
+          <ArrowRight className="w-4 h-4 ml-1" />
+        </a>
+      </div>
+    </div>
+  </div>
+);
+
+const ActivityCard = ({ activity, time, icon: Icon }) => (
+  <div className={styles.activityCard}>
+    <div className="flex items-center mb-3">
+      <div className={styles.icon}>
+        <Icon className="w-full h-full" />
+      </div>
+      <div className="ml-3">
+        <h4 className="font-medium text-gray-900">{activity.activity || activity.spot}</h4>
+        {time && <p className="text-sm text-gray-500">{time}</p>}
+      </div>
+    </div>
+    <p className="text-gray-600 text-sm">{activity.description}</p>
+    {activity.rating && (
+      <div className="mt-2 flex items-center text-gray-500">
+        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+        <span className="ml-1 text-sm">{activity.rating}</span>
+      </div>
+    )}
   </div>
 );
 
@@ -51,55 +100,54 @@ export default function Itinerary() {
   useEffect(() => {
     const fetchItineraryData = async () => {
       if (!tripId || !token) return;
-  
+      
       try {
         setLoading(true);
         setError(null);
-  
-        // Add debug logs for responses
-        const detailsResponse = await fetch(`http://localhost:8000/trips/${tripId}/details`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        console.log('Trip details response:', await detailsResponse.clone().json());
-  
-        if (!detailsResponse.ok) {
-          throw new Error(`Failed to fetch trip details: ${detailsResponse.status}`);
+        
+        const [detailsResponse, itineraryResponse] = await Promise.all([
+          fetch(`http://localhost:8000/trips/${tripId}/details`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }),
+          fetch(`http://localhost:8000/itineraries/${tripId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          })
+        ]);
+
+        if (!detailsResponse.ok || !itineraryResponse.ok) {
+          throw new Error('Failed to fetch itinerary data');
         }
-  
-        const tripDetails = await detailsResponse.json();
-        console.log('Parsed trip details:', tripDetails);
-  
-        const itineraryResponse = await fetch(`http://localhost:8000/itineraries/${tripId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+
+        const [tripDetails, itineraryDetails] = await Promise.all([
+          detailsResponse.json(),
+          itineraryResponse.json()
+        ]);
+
+        // Parse the daily_schedule if it's a string
+        let processedDailySchedule = itineraryDetails.daily_schedule;
+        if (typeof processedDailySchedule === 'string') {
+          try {
+            processedDailySchedule = JSON.parse(processedDailySchedule);
+          } catch (e) {
+            console.error('Error parsing daily_schedule:', e);
+            processedDailySchedule = [];
           }
-        });
-        console.log('Itinerary response:', await itineraryResponse.clone().json());
-  
-        if (!itineraryResponse.ok) {
-          throw new Error(`Failed to fetch itinerary: ${itineraryResponse.status}`);
         }
-  
-        const itineraryDetails = await itineraryResponse.json();
-        console.log('Parsed itinerary details:', itineraryDetails);
-  
-        // Ensure daily_schedule is properly formatted
-        const schedule = Array.isArray(itineraryDetails.daily_schedule) 
-          ? itineraryDetails.daily_schedule 
-          : typeof itineraryDetails.daily_schedule === 'string'
-            ? JSON.parse(itineraryDetails.daily_schedule)
-            : [];
-  
-        console.log('Processed schedule:', schedule);
-  
+
+        // Ensure accommodation is properly structured
+        const processedAccommodation = itineraryDetails.accommodation || [];
+
         setItineraryData({
           ...tripDetails,
           ...itineraryDetails,
-          daily_schedule: schedule
+          daily_schedule: Array.isArray(processedDailySchedule) ? processedDailySchedule : [],
+          accommodation: Array.isArray(processedAccommodation) ? processedAccommodation : []
         });
       } catch (err) {
         console.error('Error fetching itinerary:', err);
@@ -108,7 +156,7 @@ export default function Itinerary() {
         setLoading(false);
       }
     };
-  
+
     fetchItineraryData();
   }, [tripId, token]);
 
@@ -116,98 +164,103 @@ export default function Itinerary() {
   if (error) return <ErrorState message={error} />;
   if (!itineraryData) return <EmptyState />;
 
-  const schedule = itineraryData.daily_schedule;
-  if (!Array.isArray(schedule) || schedule.length === 0) {
-    return <EmptyState />;
-  }
+  // Ensure the accommodation array exists and has items
+  const accommodations = Array.isArray(itineraryData.accommodation) ? itineraryData.accommodation : [];
+  const hasAccommodations = accommodations.length > 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className={styles.container}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {itineraryData.destination}
-          </h1>
-          <div className="flex items-center justify-center gap-4 text-gray-600">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              <span>
-                {new Date(itineraryData.start_date).toLocaleDateString()} -{" "}
-                {new Date(itineraryData.end_date).toLocaleDateString()}
-              </span>
-            </div>
+        <header className={styles.header}>
+          <h1 className={styles.title}>{itineraryData.destination}</h1>
+          <div className={styles.dateRange}>
+            <Calendar className="w-5 h-5 text-blue-500" />
+            <span>
+              {new Date(itineraryData.start_date).toLocaleDateString()} -{" "}
+              {new Date(itineraryData.end_date).toLocaleDateString()}
+            </span>
           </div>
-        </div>
+        </header>
 
-        {/* Hotel Section */}
-        {itineraryData.hotel_name && (
-          <div className="mb-8 bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="bg-gray-50 px-6 py-4 border-b">
-              <h2 className="text-xl font-semibold text-gray-900">Accommodation</h2>
+        {/* Accommodations */}
+        {hasAccommodations && (
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Where You'll Stay</h2>
+            <div className={styles.accommodationGrid}>
+              {accommodations.map((hotel, index) => (
+                <AccommodationCard key={index} hotel={hotel} />
+              ))}
             </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-blue-500" />
-                  <h3 className="font-medium text-lg">{itineraryData.hotel_name}</h3>
-                </div>
-                {itineraryData.hotel_rating && (
-                  <div className="flex items-center gap-1 text-yellow-500">
-                    <Star className="w-4 h-4 fill-current" />
-                    <span>{itineraryData.hotel_rating.toFixed(1)}</span>
-                  </div>
-                )}
-                {itineraryData.hotel_location && (
-                  <p className="text-gray-600">{itineraryData.hotel_location}</p>
-                )}
-                {itineraryData.hotel_description && (
-                  <p className="text-gray-600">{itineraryData.hotel_description}</p>
-                )}
-              </div>
-            </div>
-          </div>
+          </section>
         )}
 
         {/* Daily Schedule */}
-        <div className="space-y-8">
-          {schedule.map((day, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="bg-gray-50 px-6 py-4 border-b">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  Day {index + 1}
-                  {day.date && ` - ${new Date(day.date).toLocaleDateString()}`}
-                </h2>
-              </div>
-              <div className="p-6 space-y-6">
-                <div className="grid gap-6 md:grid-cols-2">
-                  {Object.entries(day).map(([key, value]) => {
-                    if (key === 'date') return null;
-                    return (
-                      <div key={key} className="bg-gray-50 rounded-lg p-4">
-                        <h3 className="font-medium text-lg mb-2 capitalize">
-                          {key.replace('_', ' ')}
-                        </h3>
-                        {typeof value === 'object' && value !== null && (
-                          <div className="space-y-2">
-                            {Object.entries(value).map(([subKey, subValue]) => (
-                              <div key={subKey}>
-                                <span className="capitalize text-gray-600">
-                                  {subKey === 'spot' ? '' : `${subKey}: `}
-                                </span>
-                                <span className="text-gray-900">{subValue}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+        {Array.isArray(itineraryData.daily_schedule) && itineraryData.daily_schedule.length > 0 && (
+          <section>
+            {itineraryData.daily_schedule.map((day, index) => (
+              <div key={index} className={styles.scheduleCard}>
+                <div className={styles.dayHeader}>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Day {index + 1}
+                    {day.date && 
+                      <span className="text-gray-500 ml-2">
+                        {new Date(day.date).toLocaleDateString('en-US', {
+                          weekday: 'long',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    }
+                  </h2>
+                </div>
+                
+                <div className="p-6">
+                  <div className={styles.scheduleGrid}>
+                    {/* Morning */}
+                    <div className="space-y-4">
+                      <ActivityCard 
+                        activity={day.breakfast}
+                        time="Morning"
+                        icon={Coffee}
+                      />
+                      <ActivityCard 
+                        activity={day.morning_activity}
+                        icon={Building}
+                      />
+                    </div>
+
+                    {/* Afternoon */}
+                    <div className="space-y-4">
+                      <ActivityCard 
+                        activity={day.lunch}
+                        time="Afternoon"
+                        icon={Utensils}
+                      />
+                      <ActivityCard 
+                        activity={day.afternoon_activity}
+                        icon={Building}
+                      />
+                    </div>
+
+                    {/* Evening */}
+                    <div className="space-y-4">
+                      <ActivityCard 
+                        activity={day.dinner}
+                        time="Evening"
+                        icon={Utensils}
+                      />
+                      <ActivityCard 
+                        activity={day.evening_activity}
+                        icon={Sunset}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </section>
+        )}
       </div>
     </div>
   );
