@@ -11,7 +11,10 @@ import {
   ArrowRight,
   Coffee,
   Utensils,
-  Sunset
+  Sunset,
+  Cloud,
+  Bus,
+  Globe
 } from 'lucide-react';
 import styles from './Itinerary.module.css';
 
@@ -105,6 +108,44 @@ const ActivityCard = ({ activity, time, icon: Icon }) => (
   </div>
 );
 
+const TravelTipsSection = ({ tips }) => {
+  if (!tips) return null;
+  
+  return (
+    <section className="mb-12">
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">Travel Tips</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Weather Tips */}
+        <div className="bg-white p-6 rounded-lg shadow border border-gray-100">
+          <div className="flex items-center mb-4 text-blue-500">
+            <Cloud className="w-6 h-6 mr-2" />
+            <h3 className="font-semibold text-lg text-gray-900">Weather</h3>
+          </div>
+          <p className="text-gray-600">{tips.weather}</p>
+        </div>
+
+        {/* Transportation Tips */}
+        <div className="bg-white p-6 rounded-lg shadow border border-gray-100">
+          <div className="flex items-center mb-4 text-green-500">
+            <Bus className="w-6 h-6 mr-2" />
+            <h3 className="font-semibold text-lg text-gray-900">Transportation</h3>
+          </div>
+          <p className="text-gray-600">{tips.transportation}</p>
+        </div>
+
+        {/* Cultural Notes */}
+        <div className="bg-white p-6 rounded-lg shadow border border-gray-100">
+          <div className="flex items-center mb-4 text-purple-500">
+            <Globe className="w-6 h-6 mr-2" />
+            <h3 className="font-semibold text-lg text-gray-900">Cultural Notes</h3>
+          </div>
+          <p className="text-gray-600">{tips.cultural_notes}</p>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 export default function Itinerary() {
   const { tripId } = useParams();
   const { token } = useAuth();
@@ -144,6 +185,8 @@ export default function Itinerary() {
           itineraryResponse.json()
         ]);
 
+      
+
         // Parse the daily_schedule if it's a string
         let processedDailySchedule = itineraryDetails.daily_schedule;
         if (typeof processedDailySchedule === 'string') {
@@ -155,6 +198,17 @@ export default function Itinerary() {
           }
         }
 
+        // Also try parsing travel_tips if it's a string
+      let processedTravelTips = itineraryDetails.travel_tips;
+      if (typeof processedTravelTips === 'string') {
+        try {
+          processedTravelTips = JSON.parse(processedTravelTips);
+        } catch (e) {
+          console.error('Error parsing travel_tips:', e);
+          processedTravelTips = null;
+        }
+      }
+
         // Ensure accommodation is properly structured
         const processedAccommodation = itineraryDetails.accommodation || [];
 
@@ -162,7 +216,8 @@ export default function Itinerary() {
           ...tripDetails,
           ...itineraryDetails,
           daily_schedule: Array.isArray(processedDailySchedule) ? processedDailySchedule : [],
-          accommodation: Array.isArray(processedAccommodation) ? processedAccommodation : []
+          accommodation: Array.isArray(processedAccommodation) ? processedAccommodation : [],
+          travel_tips: typeof processedTravelTips === 'object' ? processedTravelTips : {}
         });
       } catch (err) {
         console.error('Error fetching itinerary:', err);
@@ -208,6 +263,11 @@ export default function Itinerary() {
               ))}
             </div>
           </section>
+        )}
+
+        {/* Travel Tips - Add this section here */}
+        {itineraryData.travel_tips && (
+          <TravelTipsSection tips={itineraryData.travel_tips} />
         )}
 
         {/* Daily Schedule */}
