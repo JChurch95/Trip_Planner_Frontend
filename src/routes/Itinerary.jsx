@@ -78,21 +78,22 @@ const ActivityCard = ({ activity, time, icon: Icon }) => (
       <div className={styles.icon}>
         <Icon className="w-full h-full" />
       </div>
-      <div className="ml-3">
-        <h4 className="font-medium text-gray-900">{activity.activity || activity.spot}</h4>
-        {time && <p className="text-sm text-gray-500">{time}</p>}
+      <div className="ml-3 flex justify-between items-start flex-grow">
+        <div>
+          <h4 className="font-medium text-gray-900">{activity.activity || activity.spot}</h4>
+          {time && <p className="text-sm text-gray-500">{time}</p>}
+        </div>
+        {activity.rating && (
+          <div className={`${styles.rating} flex items-center`}>
+            <Star className="w-4 h-4" />
+            <span className="ml-1 text-sm">{activity.rating}</span>
+          </div>
+        )}
       </div>
     </div>
     <p className="text-gray-600 text-sm">{activity.description}</p>
     
-    <div className="flex items-center justify-between">
-      {activity.rating && (
-        <div className="mt-2 flex items-center text-gray-500">
-          <Star className="w-4 h-4 text-yellow-400 fill-current" />
-          <span className="ml-1 text-sm">{activity.rating}</span>
-        </div>
-      )}
-      
+    <div className="flex items-center justify-end">
       {activity.url && (
         <a 
           href={activity.url} 
@@ -107,7 +108,6 @@ const ActivityCard = ({ activity, time, icon: Icon }) => (
     </div>
   </div>
 );
-
 const TravelTipsSection = ({ tips }) => {
   if (!tips) return null;
   
