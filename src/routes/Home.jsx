@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState } from 'react';
+import { Search, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
-import { Search, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import styles from "./Home.module.css";
 
+// Keep your original constants
 const SAMPLE_LOCATIONS = [
   "Charlotte",
   "Charlotte, North Carolina, United States",
@@ -14,25 +15,18 @@ const SAMPLE_LOCATIONS = [
 
 const DAYS_OF_WEEK = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
 ];
 
+// Calendar component remains the same but with updated styling
 function CalendarDropdown({ onSelect, onClose }) {
+  // ... [Keep your existing Calendar implementation] ...
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
 
+  // Keep all your existing calendar functions
   const getDaysInMonth = (year, month) => {
     return new Date(year, month + 1, 0).getDate();
   };
@@ -74,18 +68,17 @@ function CalendarDropdown({ onSelect, onClose }) {
   };
 
   const renderCalendar = () => {
+    // ... [Keep your existing calendar rendering logic] ...
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const daysInMonth = getDaysInMonth(year, month);
     const firstDayOfMonth = getFirstDayOfMonth(year, month);
     const days = [];
 
-    // Add empty cells for days before the first day of the month
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push(<div key={`empty-${i}`} className={styles.calendarDay}></div>);
     }
 
-    // Add the days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       const isSelected =
@@ -103,9 +96,7 @@ function CalendarDropdown({ onSelect, onClose }) {
         <button
           key={day}
           onClick={() => handleDateClick(date)}
-          className={`${styles.calendarDay} ${
-            isSelected ? styles.selected : ""
-          } 
+          className={`${styles.calendarDay} ${isSelected ? styles.selected : ""} 
                      ${isInRange ? styles.inRange : ""}`}
         >
           {day}
@@ -119,19 +110,13 @@ function CalendarDropdown({ onSelect, onClose }) {
   return (
     <div className={styles.calendarWrapper} onClick={(e) => e.stopPropagation()}>
       <div className={styles.calendarHeader}>
-        <button
-          onClick={() => navigateMonth(-1)}
-          className={styles.navigationButton}
-        >
+        <button onClick={() => navigateMonth(-1)} className={styles.navigationButton}>
           <ChevronLeft size={20} />
         </button>
         <span>
           {MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}
         </span>
-        <button
-          onClick={() => navigateMonth(1)}
-          className={styles.navigationButton}
-        >
+        <button onClick={() => navigateMonth(1)} className={styles.navigationButton}>
           <ChevronRight size={20} />
         </button>
       </div>
@@ -165,9 +150,9 @@ export default function Home() {
     additional_notes: "",
   });
 
+  // Keep all your existing handlers
   const handleFormSubmit = async () => {
     setIsCreatingTrip(true);
-
     try {
       if (!token || !user) {
         console.error("No authentication token or user found");
@@ -212,19 +197,11 @@ export default function Home() {
       }
 
       const data = await response.json();
-      console.log("Full response data:", data);
-
       if (data && data.message && data.trip) {
-        console.log("Trip ID:", data.trip.id);
         setShowDetailsModal(false);
         setTimeout(() => {
           navigate(`/itinerary/${data.trip.id}`);
         }, 1000);
-      } else {
-        console.error(
-          "Unexpected response format. Expected: { message, trip }, Received:",
-          data
-        );
       }
     } catch (error) {
       console.error("Error creating trip:", error);
@@ -255,91 +232,96 @@ export default function Home() {
   };
 
   return (
-    <div className={`${styles.container} py-16 text-white`}>
-      {/* Main Title */}
-      <h1 className="text-4xl md:text-5xl font-bold text-center max-w-3xl mx-auto mb-16 px-4 leading-tight">
-        Simplify your trip planning with
-        <br />
-        AI powered itineraries
-      </h1>
-
-      {/* Search Container */}
-      <div className={styles.searchContainer}>
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Location Search */}
-          <div className="relative flex-1">
-            <Search
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-              size={20}
-            />
-            <input
-              type="text"
-              value={searchText}
-              onChange={(e) => {
-                setSearchText(e.target.value);
-                setShowLocations(true);
-              }}
-              onFocus={() => setShowLocations(true)}
-              placeholder="Where?"
-              className="w-full bg-gray-900/50 border border-gray-800 rounded-lg py-3 px-12 text-white placeholder-gray-400 focus:outline-none focus:border-gray-700"
-            />
-
-            {showLocations && searchText && (
-              <div className={styles.suggestions}>
-                {filteredLocations.map((location) => (
-                  <button
-                    key={location}
-                    onClick={() => handleLocationSelect(location)}
-                    className={styles.suggestionItem}
-                  >
-                    {location}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Date Input */}
-          <div className="relative flex-1">
-            <Calendar
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-              size={20}
-            />
-            <input
-              type="text"
-              value={dateRange}
-              onClick={() => setShowCalendar(!showCalendar)}
-              placeholder="Pick a date"
-              readOnly
-              className="w-full bg-gray-900/50 border border-gray-800 rounded-lg py-3 px-12 text-white placeholder-gray-400 focus:outline-none focus:border-gray-700 cursor-pointer"
-            />
-            {showCalendar && (
-              <CalendarDropdown
-                onSelect={handleDateSelect}
-                onClose={() => setShowCalendar(false)}
-              />
-            )}
-          </div>
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+      {/* Hero Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-16">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Simplify your trip planning with
+            <br />
+            <span className="bg-gradient-to-r from-green-500 to-orange-500 text-transparent bg-clip-text">
+              AI powered itineraries
+            </span>
+          </h1>
         </div>
 
-        {/* Generate Button */}
-        <button
-          onClick={handleGenerateClick}
-          className={`${styles.generateButton} w-full bg-black border border-gray-800 rounded-lg py-3 text-white font-medium mt-4`}
-        >
-          <span className="relative">Generate Itinerary</span>
-        </button>
+        {/* Search Container */}
+        <div className="max-w-3xl mx-auto space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* Location Search */}
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                value={searchText}
+                onChange={(e) => {
+                  setSearchText(e.target.value);
+                  setShowLocations(true);
+                }}
+                onFocus={() => setShowLocations(true)}
+                placeholder="Where to?"
+                className="block w-full pl-10 pr-3 py-4 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm"
+              />
+              
+              {/* Location Suggestions */}
+              {showLocations && searchText && (
+                <div className="absolute z-10 w-full mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+                  {filteredLocations.map((location) => (
+                    <button
+                      key={location}
+                      onClick={() => handleLocationSelect(location)}
+                      className="block w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      {location}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Date Selection */}
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Calendar className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                value={dateRange}
+                onClick={() => setShowCalendar(!showCalendar)}
+                placeholder="When?"
+                readOnly
+                className="block w-full pl-10 pr-3 py-4 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm cursor-pointer"
+              />
+              {showCalendar && (
+                <CalendarDropdown
+                  onSelect={handleDateSelect}
+                  onClose={() => setShowCalendar(false)}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Generate Button */}
+          <button 
+            onClick={handleGenerateClick}
+            className="w-full bg-gradient-to-r from-green-500 to-orange-500 text-white font-medium py-4 px-6 rounded-xl hover:opacity-90 transition-all hover:scale-[1.02] transform duration-200 flex items-center justify-center group shadow-md"
+          >
+            Generate Itinerary
+          </button>
+        </div>
       </div>
 
       {/* Details Modal */}
       {showDetailsModal && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h2 className="text-xl font-semibold mb-2">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl p-6 max-w-lg w-full shadow-xl">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
               Additional details?{" "}
-              <span className="text-gray-400 text-sm font-normal">Optional</span>
+              <span className="text-gray-500 text-sm font-normal">Optional</span>
             </h2>
-            <p className="text-gray-400 text-sm mb-6">
+            <p className="text-gray-600 text-sm mb-6">
               While we are generating your itinerary, let us know more about your
               trip - dietary preferences, existing plans, places you want to make
               sure to cover, etc.
@@ -347,7 +329,7 @@ export default function Home() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   What time are you arriving / departing?
                 </label>
                 <input
@@ -360,12 +342,12 @@ export default function Home() {
                     }))
                   }
                   placeholder="Flying in late thursday night..."
-                  className="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600"
+                  className="w-full border border-gray-300 rounded-lg p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Additional information
                 </label>
                 <textarea
@@ -377,21 +359,20 @@ export default function Home() {
                     }))
                   }
                   placeholder="I am vegetarian. I want to make sure to visit the Eiffel Tower. I am traveling with my wife and 2 kids."
-                  className="w-full h-32 bg-gray-800/50 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 resize-none focus:outline-none focus:border-gray-600"
+                  className="w-full h-32 border border-gray-300 rounded-lg p-3 text-gray-900 placeholder-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 />
               </div>
 
               <button
                 onClick={handleFormSubmit}
-                type="button"
                 disabled={isCreatingTrip}
-                className={`w-full bg-white text-gray-900 rounded-lg py-3 font-medium hover:bg-gray-100 transition-colors ${
+                className={`w-full bg-gradient-to-r from-green-500 to-orange-500 text-white rounded-lg py-3 font-medium hover:opacity-90 transition-all ${
                   isCreatingTrip ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
                 {isCreatingTrip ? (
                   <div className="flex items-center justify-center">
-                    <div className="animate-spin mr-2 h-5 w-5 border-t-2 border-b-2 border-gray-900 rounded-full" />
+                    <div className="animate-spin mr-2 h-5 w-5 border-t-2 border-b-2 border-white rounded-full" />
                     Creating your trip...
                   </div>
                 ) : (

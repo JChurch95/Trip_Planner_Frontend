@@ -1,0 +1,25 @@
+.navLink {
+  position: relative;
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background: linear-gradient(90deg, #22c55e, #f97316);
+  transition: width 0.3s ease;
+}
+
+.navLink:hover::after {
+  width: 100%;
+}
+
+.logoText {
+  background: linear-gradient(90deg, #22c55e, #f97316);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
