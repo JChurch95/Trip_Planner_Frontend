@@ -32,7 +32,9 @@ const NavBar = () => {
 
   const isActiveRoute = (item) => {
     const path = `/${item.toLowerCase().replace(" ", "-")}`;
-    return location.pathname === path || (item === "Plan Trip" && location.pathname === "/");
+    return location.pathname === path || 
+      (item === "Plan Trip" && location.pathname === "/") ||
+      (item === "My Trips" && location.pathname.includes("/itinerary"));
   };
 
   return (
@@ -128,15 +130,15 @@ const NavBar = () => {
             {navItems.map((item) => (
               <motion.div
                 key={item}
-                whileHover={{ y: -2 }}
-                whileTap={{ y: 0 }}
+                whileHover={{ y: -2, scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 <Link
                   to={`/${item.toLowerCase().replace(" ", "-")}`}
                   className={`px-6 py-2 rounded-full font-medium transition-all ${
                     isActiveRoute(item)
                       ? "bg-gradient-to-r from-green-500 to-orange-500 text-white shadow-lg hover:shadow-xl"
-                      : "text-gray-700 hover:text-orange-500"
+                      : "text-gray-700 hover:text-orange-500 hover:bg-gray-50"
                   }`}
                 >
                   {item}
@@ -144,14 +146,13 @@ const NavBar = () => {
               </motion.div>
             ))}
           </div>
-
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ y: -2, scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-6 py-2 text-gray-700 hover:text-orange-500 transition-colors font-medium rounded-full hover:bg-gray-50 pr-4"
+            className="px-6 py-2 rounded-full font-medium transition-all text-gray-700 hover:text-orange-500 hover:bg-gray-50"
             onClick={handleLogout}
           >
-            Logout
+            Hop Out
           </motion.button>
         </div>
       </div>

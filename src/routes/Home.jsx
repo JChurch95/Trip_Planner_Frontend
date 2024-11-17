@@ -6,11 +6,26 @@ import styles from "./Home.module.css";
 
 // Keep your original constants
 const SAMPLE_LOCATIONS = [
-  "Charlotte",
-  "Charlotte, North Carolina, United States",
-  "Charlottesville, Virginia, United States",
-  "Charlotte Amalie, Saint Thomas, US Virgin Islands",
-  "Charlottetown, Prince Edward Island, Canada",
+  "New York City, United States",
+  "Tokyo, Japan",
+  "London, United Kingdom",
+  "Paris, France",
+  "Sydney, Australia",
+  "Dubai, United Arab Emirates",
+  "Singapore, Singapore",
+  "Rio de Janeiro, Brazil",
+  "Cape Town, South Africa",
+  "Moscow, Russia",
+  "Bangkok, Thailand",
+  "Istanbul, Turkey",
+  "Hong Kong, China",
+  "Toronto, Canada",
+  "Mumbai, India",
+  "Los Angeles, United States",
+  "Berlin, Germany",
+  "Rome, Italy",
+  "Buenos Aires, Argentina",
+  "Seoul, South Korea",
 ];
 
 const DAYS_OF_WEEK = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];

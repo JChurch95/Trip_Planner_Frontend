@@ -14,7 +14,7 @@ import {
   Sunset,
   Cloud,
   Bus,
-  Globe
+  Globe,
 } from 'lucide-react';
 import styles from './Itinerary.module.css';
 
@@ -242,7 +242,7 @@ export default function Itinerary() {
     <div className={styles.container}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <header className={styles.header}>
+        <header className="pt-32 pb-8 text-center">
           <h1 className={styles.title}>{itineraryData.destination}</h1>
           <div className={styles.dateRange}>
             <Calendar className="w-5 h-5 text-blue-500" />
