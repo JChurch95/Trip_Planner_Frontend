@@ -237,10 +237,10 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-16">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Simplify your trip planning with
+          Hop into hassle free planning with
             <br />
             <span className="bg-gradient-to-r from-green-500 to-orange-500 text-transparent bg-clip-text">
-              AI powered itineraries
+            AI powered itineraries!
             </span>
           </h1>
         </div>
