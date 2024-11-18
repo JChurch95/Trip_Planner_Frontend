@@ -11,6 +11,7 @@ import UserProfile from '../routes/Profile';
 import MyTrips from '../routes/MyTrips';
 import Login, { action as loginAction } from '../routes/Login';
 import Registration, { action as registrationAction } from '../routes/Registration';
+import DirectionalTransition from '../components/DirectionalTransition';
 
 // Context and Utilities
 import { useAuth } from '../AuthContext';
@@ -46,50 +47,62 @@ export const publicRoutes = [
       {
         path: "/",
         element: (
-          <ProtectedLayout>
-            <Home />
-          </ProtectedLayout>
+          <DirectionalTransition>
+            <ProtectedLayout>
+              <Home />
+            </ProtectedLayout>
+          </DirectionalTransition>
         ),
       },
       {
         path: "/my-trips",
         element: (
-          <ProtectedLayout>
-            <MyTrips />
-          </ProtectedLayout>
+          <DirectionalTransition>
+            <ProtectedLayout>
+              <MyTrips />
+            </ProtectedLayout>
+          </DirectionalTransition>
         ),
       },
       {
         path: "/itinerary/:tripId",
         element: (
-          <ProtectedLayout>
-            <Itinerary />
-          </ProtectedLayout>
+          <DirectionalTransition>
+            <ProtectedLayout>
+              <Itinerary />
+            </ProtectedLayout>
+          </DirectionalTransition>
         ),
       },
       {
         path: "/profile",
         element: (
-          <ProtectedLayout>
-            <UserProfile />
-          </ProtectedLayout>
+          <DirectionalTransition>
+            <ProtectedLayout>
+              <UserProfile />
+            </ProtectedLayout>
+          </DirectionalTransition>
         ),
       },
       {
         path: "/login",
         element: (
-          <AuthLayout>
-            <Login />
-          </AuthLayout>
+          <DirectionalTransition>
+            <AuthLayout>
+              <Login />
+            </AuthLayout>
+          </DirectionalTransition>
         ),
         action: loginAction,
       },
       {
         path: "/registration",
         element: (
-          <AuthLayout>
-            <Registration />
-          </AuthLayout>
+          <DirectionalTransition>
+            <AuthLayout>
+              <Registration />
+            </AuthLayout>
+          </DirectionalTransition>
         ),
         action: registrationAction,
       },

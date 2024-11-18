@@ -23,3 +23,11 @@
   background-clip: text;
   color: transparent;
 }
+
+.content-shift {
+  transition: padding-top 0.3s ease;
+}
+
+.navbar-hidden {
+  padding-top: 0;
+}

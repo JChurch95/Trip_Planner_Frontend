@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { Search, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from "react";
+import { Search, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import styles from "./Home.module.css";
+import { motion } from "framer-motion";
 
 // Keep your original constants
 const SAMPLE_LOCATIONS = [
@@ -28,10 +29,41 @@ const SAMPLE_LOCATIONS = [
   "Seoul, South Korea",
 ];
 
+const UI_TO_BACKEND_MAPPINGS = {
+  travelerType: {
+    "Solo Adventurer": "solo",
+    "Traveling Duo": "couple",
+    "Family Expedition": "family",
+    "Group Journey": "group",
+  },
+  activityLevel: {
+    "Relaxed & Easy": "relaxed",
+    "Moderately Active": "moderate",
+    "Very Active": "active",
+  },
+  budgetRange: {
+    "Budget ($50-100/day)": "BUDGET",
+    "Comfort ($100-200/day)": "COMFORT",
+    "Premium ($200-500/day)": "PREMIUM",
+    "Luxury ($500-1000/day)": "LUXURY",
+    "Ultra Luxury ($1000+/day)": "ULTRA_LUXURY",
+  },
+};
+
 const DAYS_OF_WEEK = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 // Calendar component remains the same but with updated styling
@@ -111,7 +143,9 @@ function CalendarDropdown({ onSelect, onClose }) {
         <button
           key={day}
           onClick={() => handleDateClick(date)}
-          className={`${styles.calendarDay} ${isSelected ? styles.selected : ""} 
+          className={`${styles.calendarDay} ${
+            isSelected ? styles.selected : ""
+          } 
                      ${isInRange ? styles.inRange : ""}`}
         >
           {day}
@@ -123,15 +157,24 @@ function CalendarDropdown({ onSelect, onClose }) {
   };
 
   return (
-    <div className={styles.calendarWrapper} onClick={(e) => e.stopPropagation()}>
+    <div
+      className={styles.calendarWrapper}
+      onClick={(e) => e.stopPropagation()}
+    >
       <div className={styles.calendarHeader}>
-        <button onClick={() => navigateMonth(-1)} className={styles.navigationButton}>
+        <button
+          onClick={() => navigateMonth(-1)}
+          className={styles.navigationButton}
+        >
           <ChevronLeft size={20} />
         </button>
         <span>
           {MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}
         </span>
-        <button onClick={() => navigateMonth(1)} className={styles.navigationButton}>
+        <button
+          onClick={() => navigateMonth(1)}
+          className={styles.navigationButton}
+        >
           <ChevronRight size={20} />
         </button>
       </div>
@@ -163,6 +206,7 @@ export default function Home() {
     dietary_preferences: "",
     activity_preferences: "",
     additional_notes: "",
+    traveler_type: "",
   });
 
   // Keep all your existing handlers
@@ -247,157 +291,273 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-16">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-          Hop into hassle free planning with
-            <br />
-            <span className="bg-gradient-to-r from-green-500 to-orange-500 text-transparent bg-clip-text">
-            AI powered itineraries!
-            </span>
-          </h1>
-        </div>
-
-        {/* Search Container */}
-        <div className="max-w-3xl mx-auto space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
-            {/* Location Search */}
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                value={searchText}
-                onChange={(e) => {
-                  setSearchText(e.target.value);
-                  setShowLocations(true);
-                }}
-                onFocus={() => setShowLocations(true)}
-                placeholder="Where to?"
-                className="block w-full pl-10 pr-3 py-4 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm"
-              />
-              
-              {/* Location Suggestions */}
-              {showLocations && searchText && (
-                <div className="absolute z-10 w-full mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-                  {filteredLocations.map((location) => (
-                    <button
-                      key={location}
-                      onClick={() => handleLocationSelect(location)}
-                      className="block w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      {location}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Date Selection */}
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Calendar className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                value={dateRange}
-                onClick={() => setShowCalendar(!showCalendar)}
-                placeholder="When?"
-                readOnly
-                className="block w-full pl-10 pr-3 py-4 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm cursor-pointer"
-              />
-              {showCalendar && (
-                <CalendarDropdown
-                  onSelect={handleDateSelect}
-                  onClose={() => setShowCalendar(false)}
-                />
-              )}
-            </div>
+    <motion.div
+      initial={{ x: 300, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: -300, opacity: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-navbar pb-16">
+          <div className="text-center mb-16">
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Hop into hassle free planning with
+              <br />
+              <span className="animate-gradient bg-gradient-to-r from-green-500 via-emerald-500 via-orange-400 to-orange-500 text-transparent bg-clip-text">
+                AI powered itineraries!
+              </span>
+            </h1>
           </div>
-
-          {/* Generate Button */}
-          <button 
-            onClick={handleGenerateClick}
-            className="w-full bg-gradient-to-r from-green-500 to-orange-500 text-white font-medium py-4 px-6 rounded-xl hover:opacity-90 transition-all hover:scale-[1.02] transform duration-200 flex items-center justify-center group shadow-md"
-          >
-            Generate Itinerary
-          </button>
-        </div>
-      </div>
-
-      {/* Details Modal */}
-      {showDetailsModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl p-6 max-w-lg w-full shadow-xl">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              Additional details?{" "}
-              <span className="text-gray-500 text-sm font-normal">Optional</span>
-            </h2>
-            <p className="text-gray-600 text-sm mb-6">
-              While we are generating your itinerary, let us know more about your
-              trip - dietary preferences, existing plans, places you want to make
-              sure to cover, etc.
-            </p>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  What time are you arriving / departing?
-                </label>
+          {/* Search Container */}
+          <div className="max-w-3xl mx-auto space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Location Search */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
+                </div>
                 <input
                   type="text"
-                  value={formData.arrival_time}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      arrival_time: e.target.value,
-                    }))
-                  }
-                  placeholder="Flying in late thursday night..."
-                  className="w-full border border-gray-300 rounded-lg p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  value={searchText}
+                  onChange={(e) => {
+                    setSearchText(e.target.value);
+                    setShowLocations(true);
+                  }}
+                  onFocus={() => setShowLocations(true)}
+                  placeholder="Where to?"
+                  className="block w-full pl-10 pr-3 py-4 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm"
                 />
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Additional information
-                </label>
-                <textarea
-                  value={formData.additional_notes}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      additional_notes: e.target.value,
-                    }))
-                  }
-                  placeholder="I am vegetarian. I want to make sure to visit the Eiffel Tower. I am traveling with my wife and 2 kids."
-                  className="w-full h-32 border border-gray-300 rounded-lg p-3 text-gray-900 placeholder-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                />
-              </div>
-
-              <button
-                onClick={handleFormSubmit}
-                disabled={isCreatingTrip}
-                className={`w-full bg-gradient-to-r from-green-500 to-orange-500 text-white rounded-lg py-3 font-medium hover:opacity-90 transition-all ${
-                  isCreatingTrip ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-              >
-                {isCreatingTrip ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin mr-2 h-5 w-5 border-t-2 border-b-2 border-white rounded-full" />
-                    Creating your trip...
+                {/* Location Suggestions */}
+                {showLocations && searchText && (
+                  <div className="absolute z-10 w-full mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+                    {filteredLocations.map((location) => (
+                      <button
+                        key={location}
+                        onClick={() => handleLocationSelect(location)}
+                        className="block w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        {location}
+                      </button>
+                    ))}
                   </div>
-                ) : (
-                  'Generate!'
                 )}
-              </button>
+              </div>
+
+              {/* Date Selection */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Calendar className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  value={dateRange}
+                  onClick={() => setShowCalendar(!showCalendar)}
+                  placeholder="When?"
+                  readOnly
+                  className="block w-full pl-10 pr-3 py-4 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm cursor-pointer"
+                />
+                {showCalendar && (
+                  <CalendarDropdown
+                    onSelect={handleDateSelect}
+                    onClose={() => setShowCalendar(false)}
+                  />
+                )}
+              </div>
             </div>
+
+            {/* Generate Button */}
+            <button
+              onClick={handleGenerateClick}
+              className="w-full animate-gradient bg-gradient-to-r from-green-500 via-emerald-500 via-orange-400 to-orange-500 text-white font-medium py-4 px-6 rounded-xl hover:opacity-90 transition-all hover:scale-[1.02] transform duration-200 flex items-center justify-center group shadow-md"
+            >
+              Generate Itinerary
+            </button>
           </div>
         </div>
-      )}
-    </div>
+        {/* Details Modal */}
+        {showDetailsModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+              <div className="p-4 sm:p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Tell us about your trip to {searchText}
+                </h2>
+              </div>
+
+              <div className="p-4 sm:p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  {/* Left Column */}
+                  <div>
+                    {/* Traveler Type */}
+                    <div className="mb-4 sm:mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Who's traveling?
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {Object.entries(
+                          UI_TO_BACKEND_MAPPINGS.travelerType
+                        ).map(([display, value]) => (
+                          <button
+                            key={value}
+                            onClick={() =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                traveler_type: value,
+                              }))
+                            }
+                            className={`p-2 sm:p-3 rounded-lg text-sm sm:text-base transition-all ${
+                              formData.traveler_type === value
+                                ? "bg-gradient-to-r from-green-500 to-orange-500 text-white"
+                                : "border border-gray-200 text-gray-700 hover:border-green-500"
+                            }`}
+                          >
+                            {display}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Activity Level */}
+                    <div className="mb-4 sm:mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        What's your preferred activity level?
+                      </label>
+                      <div className="grid grid-cols-1 gap-2">
+                        {Object.entries(
+                          UI_TO_BACKEND_MAPPINGS.activityLevel
+                        ).map(([display, value]) => (
+                          <button
+                            key={value}
+                            onClick={() =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                activity_level: value,
+                              }))
+                            }
+                            className={`p-2 sm:p-3 rounded-lg text-sm sm:text-base transition-all ${
+                              formData.activity_level === value
+                                ? "bg-gradient-to-r from-green-500 to-orange-500 text-white"
+                                : "border border-gray-200 text-gray-700 hover:border-green-500"
+                            }`}
+                          >
+                            {display}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Budget Range */}
+                    <div className="mb-4 sm:mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        What's your budget range?
+                      </label>
+                      <div className="grid grid-cols-1 gap-2">
+                        {Object.entries(UI_TO_BACKEND_MAPPINGS.budgetRange).map(
+                          ([display, value]) => (
+                            <button
+                              key={value}
+                              onClick={() =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  budget_preference: value,
+                                }))
+                              }
+                              className={`p-2 sm:p-3 rounded-lg text-sm sm:text-base transition-all ${
+                                formData.budget_preference === value
+                                  ? "bg-gradient-to-r from-green-500 to-orange-500 text-white"
+                                  : "border border-gray-200 text-gray-700 hover:border-green-500"
+                              }`}
+                            >
+                              {display}
+                            </button>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column */}
+                  <div>
+                    {/* Special Interests */}
+                    <div className="mb-4 sm:mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        What are your special interests?
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.special_interests || ""}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            special_interests: e.target.value,
+                          }))
+                        }
+                        placeholder="Photography, Local Markets, Street Food..."
+                        className="w-full border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    {/* Dietary Preferences */}
+                    <div className="mb-4 sm:mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Any dietary preferences?
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.dietary_preferences || ""}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            dietary_preferences: e.target.value,
+                          }))
+                        }
+                        placeholder="Vegetarian, Gluten-free, Halal..."
+                        className="w-full border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    {/* Additional Notes */}
+                    <div className="mb-4 sm:mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Anything else we should know?
+                      </label>
+                      <textarea
+                        value={formData.additional_notes || ""}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            additional_notes: e.target.value,
+                          }))
+                        }
+                        placeholder="Special requests, must-see places, or other preferences..."
+                        className="w-full h-[120px] sm:h-[158px] border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 sm:p-6 border-t border-gray-100 sticky bottom-0 bg-white">
+                <button
+                  onClick={handleFormSubmit}
+                  disabled={isCreatingTrip}
+                  className="w-full bg-gradient-to-r from-green-500 to-orange-500 text-white font-medium py-3 sm:py-4 px-6 rounded-xl hover:opacity-90 transition-all hover:scale-[1.02] transform duration-200 flex items-center justify-center group shadow-md text-sm sm:text-base"
+                >
+                  {isCreatingTrip ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin mr-2 h-5 w-5 border-t-2 border-b-2 border-white rounded-full" />
+                      Creating your trip...
+                    </div>
+                  ) : (
+                    "Generate Itinerary"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 }

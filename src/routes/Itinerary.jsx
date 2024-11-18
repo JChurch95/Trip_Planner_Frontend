@@ -240,9 +240,9 @@ export default function Itinerary() {
 
   return (
     <div className={styles.container}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-navbar-sm transition-all duration-300">
         {/* Header */}
-        <header className="pt-32 pb-8 text-center">
+        <header className="pt-60 pb-8 text-center">
           <h1 className={styles.title}>{itineraryData.destination}</h1>
           <div className={styles.dateRange}>
             <Calendar className="w-5 h-5 text-blue-500" />

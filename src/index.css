@@ -16,3 +16,20 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 400% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 400% 400%;
+  background-image: linear-gradient(to right, #22c55e, #22c55e, #f97316, #f97316, #22c55e, #22c55e, #f97316, #f97316, #22c55e);
+  animation: gradient-shift 20s linear infinite;
+}
+
+
