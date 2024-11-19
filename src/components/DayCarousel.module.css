@@ -1,0 +1,9 @@
+.rating {
+  display: flex;
+  align-items: center;
+  padding: 2px 8px;
+  background-color: #f8fafc;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  color: #64748b;
+}

@@ -17,6 +17,10 @@ import {
   Globe,
 } from 'lucide-react';
 import styles from './Itinerary.module.css';
+import DayCarousel from '../components/DayCarousel';
+
+
+
 
 const LoadingState = () => (
   <div className={styles.loadingState}>
@@ -108,6 +112,7 @@ const ActivityCard = ({ activity, time, icon: Icon }) => (
     </div>
   </div>
 );
+
 const TravelTipsSection = ({ tips }) => {
   if (!tips) return null;
   
@@ -272,68 +277,9 @@ export default function Itinerary() {
 
         {/* Daily Schedule */}
         {Array.isArray(itineraryData.daily_schedule) && itineraryData.daily_schedule.length > 0 && (
-          <section>
-            {itineraryData.daily_schedule.map((day, index) => (
-              <div key={index} className={styles.scheduleCard}>
-                <div className={styles.dayHeader}>
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    Day {index + 1}
-                    {day.date && 
-                      <span className="text-gray-500 ml-2">
-                        {new Date(day.date).toLocaleDateString('en-US', {
-                          weekday: 'long',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </span>
-                    }
-                  </h2>
-                </div>
-                
-                <div className="p-6">
-                  <div className={styles.scheduleGrid}>
-                    {/* Morning */}
-                    <div className="space-y-4">
-                      <ActivityCard 
-                        activity={day.breakfast}
-                        time="Morning"
-                        icon={Coffee}
-                      />
-                      <ActivityCard 
-                        activity={day.morning_activity}
-                        icon={Building}
-                      />
-                    </div>
-
-                    {/* Afternoon */}
-                    <div className="space-y-4">
-                      <ActivityCard 
-                        activity={day.lunch}
-                        time="Afternoon"
-                        icon={Utensils}
-                      />
-                      <ActivityCard 
-                        activity={day.afternoon_activity}
-                        icon={Building}
-                      />
-                    </div>
-
-                    {/* Evening */}
-                    <div className="space-y-4">
-                      <ActivityCard 
-                        activity={day.dinner}
-                        time="Evening"
-                        icon={Utensils}
-                      />
-                      <ActivityCard 
-                        activity={day.evening_activity}
-                        icon={Sunset}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Daily Schedule</h2>
+            <DayCarousel dailySchedule={itineraryData.daily_schedule} />
           </section>
         )}
       </div>

@@ -7,10 +7,11 @@ const RecoverTripButton = ({ tripId, onSuccess }) => {
   const handleRecover = async () => {
     setIsRecovering(true);
     const token = sessionStorage.getItem('sb-access-token');
+    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
     try {
-      const response = await fetch(`http://localhost:8000/trips/${tripId}/publish?publish=true`, {
-        method: 'PUT',
+      const response = await fetch(`${baseUrl}/trips/${tripId}/recover`, {
+        method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

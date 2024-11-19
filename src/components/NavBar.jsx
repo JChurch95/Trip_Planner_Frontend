@@ -19,21 +19,20 @@ const NavBar = () => {
       const currentScrollPos = window.scrollY;
       setIsScrolled(currentScrollPos > 20);
       
-      // Show navbar at top of page
+      // Only show navbar when user is at the very top
       if (currentScrollPos < 10) {
         setVisible(true);
         setPrevScrollPos(currentScrollPos);
         return;
       }
 
-      // Determine scroll direction and visibility
-      setVisible(prevScrollPos > currentScrollPos);
-      setPrevScrollPos(currentScrollPos);
+      // Keep navbar hidden until user reaches top
+      setVisible(false);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [prevScrollPos]);
+  }, []);
 
   const handleLogout = async () => {
     const { error } = await logout();

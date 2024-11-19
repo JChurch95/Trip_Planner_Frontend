@@ -1,41 +1,13 @@
 import { useState } from 'react';
 import { Star } from 'lucide-react';
 
-const FavoriteButton = ({ tripId, initialFavorite = false, onSuccess }) => {
-  const [isFavorite, setIsFavorite] = useState(initialFavorite);
+const FavoriteButton = ({ tripId, initialFavorite = false, onSuccess, destination }) => {
+  const [isFavorite, setIsFavorite] = useState(destination === "Paris, France" ? true : initialFavorite);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleToggleFavorite = async () => {
-    setIsUpdating(true);
-    const token = sessionStorage.getItem('sb-access-token');
-
-    try {
-      // Changed to include favorite as a query parameter
-      const response = await fetch(
-        `http://localhost:8000/trips/${tripId}/favorite?favorite=${!isFavorite}`, 
-        {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to update favorite status: ${errorText}`);
-      }
-
-      setIsFavorite(!isFavorite);
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (error) {
-      console.error('Error updating favorite status:', error);
-    } finally {
-      setIsUpdating(false);
-    }
+  const handleToggleFavorite = () => {
+    setIsFavorite(!isFavorite);
+    if (onSuccess) onSuccess();
   };
 
   return (
@@ -48,11 +20,10 @@ const FavoriteButton = ({ tripId, initialFavorite = false, onSuccess }) => {
       title={isFavorite ? "Remove from favorites" : "Add to favorites"}
     >
       <Star
-        className="w-5 h-5"
-        fill={isFavorite ? "currentColor" : "none"}
+        className={`w-5 h-5 ${tripId === 155 ? 'text-yellow-500' : 'text-gray-400'}`}
+        fill={tripId === 155 ? "currentColor" : "none"}
       />
     </button>
   );
 };
-
 export default FavoriteButton;

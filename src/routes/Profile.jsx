@@ -9,11 +9,12 @@ import {
   Trophy,
   Check,
   ChevronDown,
-  Camera
+  Camera,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Listbox } from "@headlessui/react";
-import Cropper from 'react-easy-crop';
+import Cropper from "react-easy-crop";
+import { Link } from 'react-router-dom'
 
 const SUPPORTED_LANGUAGES = [
   { value: "en", label: "English" },
@@ -37,12 +38,14 @@ const MultiSelect = ({ options, value = [], onChange, placeholder }) => (
       <Listbox.Button className="w-full rounded-xl border border-gray-200 py-3 px-4 text-left shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-500">
         <span className="block truncate text-gray-900">
           {Array.isArray(value) && value.length
-            ? value.map(v => options.find(opt => opt.value === v)?.label).join(' • ')
+            ? value
+                .map((v) => options.find((opt) => opt.value === v)?.label)
+                .join(" • ")
             : placeholder}
         </span>
         <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
       </Listbox.Button>
-      
+
       <Listbox.Options className="absolute z-50 mt-1 w-full rounded-xl bg-white py-1 shadow-lg border border-gray-100">
         {options.map((option) => (
           <Listbox.Option
@@ -50,13 +53,17 @@ const MultiSelect = ({ options, value = [], onChange, placeholder }) => (
             value={option.value}
             className={({ active }) =>
               `cursor-pointer select-none px-4 py-2 ${
-                active ? 'bg-green-50 text-green-900' : 'text-gray-900'
+                active ? "bg-green-50 text-green-900" : "text-gray-900"
               }`
             }
           >
             {({ selected }) => (
               <div className="flex items-center">
-                <span className={`flex-grow ${selected ? 'font-medium' : 'font-normal'}`}>
+                <span
+                  className={`flex-grow ${
+                    selected ? "font-medium" : "font-normal"
+                  }`}
+                >
                   {option.label}
                 </span>
                 {selected && <Check className="h-5 w-5 text-green-500" />}
@@ -81,7 +88,7 @@ const DashboardSection = ({ title, icon, children }) => (
   >
     <div className="absolute inset-0 bg-gradient-to-br from-green-50/30 to-orange-50/30 pointer-events-none" />
     <div className="relative">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-6 lg:justify-start justify-center">
         {icon}
         <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
       </div>
@@ -113,18 +120,19 @@ const TravelStats = ({ trips }) => {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: index * 0.1 }}
           key={key}
-          className="bg-gradient-to-br from-white to-gray-50 rounded-xl p-6 text-center shadow-sm border border-gray-100"
+          className="aspect-square lg:aspect-auto"
         >
-          <div className="text-3xl font-bold text-orange-500">{value}</div>
-          <div className="text-sm text-gray-600 mt-2">
-            {key.replace(/([A-Z])/g, " $1").trim()}
+          <div className="h-full lg:h-[120px] bg-gradient-to-br from-white to-gray-50 rounded-xl p-4 lg:p-6 flex flex-col justify-center items-center text-center">
+            <div className="text-3xl font-bold text-orange-500">{value}</div>
+            <div className="text-sm text-gray-600 mt-2 mx-auto">
+              {key.replace(/([A-Z])/g, " $1").trim()}
+            </div>
           </div>
         </motion.div>
       ))}
     </div>
   );
 };
-
 const TripGallery = ({ trips }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     {trips?.map((trip, index) => (
@@ -176,81 +184,86 @@ const TravelGoals = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2">
         <input
           type="text"
           value={newGoal}
           onChange={(e) => setNewGoal(e.target.value)}
           placeholder="Add a new travel goal..."
-          className="flex-1 rounded-xl border border-gray-200 py-2 px-4 focus:border-green-500 focus:ring-2 focus:ring-green-500 text-white"
+          className="flex-grow rounded-xl border border-gray-200 px-4 py-2 text-gray-900"
         />
         <button
           onClick={addGoal}
-          className="animate-gradient text-white px-4 py-2 rounded-xl hover:opacity-90 transition-all"
+          className="px-4 py-2 rounded-xl bg-green-500 text-white hover:bg-green-600"
         >
           Add Goal
         </button>
       </div>
-
-      {goals.map((goal, index) => (
-        <motion.div
-          initial={{ x: -20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: index * 0.1 }}
-          key={goal}
-          className="flex items-center justify-between gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100"
-        >
-          <div className="flex items-center gap-3">
-            <Trophy className="text-orange-500" size={20} />
-            <span className="text-gray-900 font-medium">{goal}</span>
-          </div>
-          <button
-            onClick={() => removeGoal(index)}
-            className="text-gray-400 hover:text-red-500 transition-colors"
+      <ul className="space-y-2">
+        {goals.map((goal, index) => (
+          <li
+            key={index}
+            className="flex items-center justify-between bg-gray-50 rounded-xl p-4"
           >
-            ×
-          </button>
-        </motion.div>
-      ))}
+            <div className="flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-orange-500" />
+              <span className="text-gray-900">{goal}</span>
+            </div>
+            <button
+              onClick={() => removeGoal(index)}
+              className="text-red-500 hover:text-red-600"
+            >
+              Remove
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
-
 const QuickPreferences = ({ profile, onUpdate }) => {
-  const [saving, setSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const { token } = useAuth();
+  const [localPreferences, setLocalPreferences] = useState({
+    preferred_languages: profile.preferred_languages || [],
+    accessibility_needs: profile.accessibility_needs || []
+  });
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const handleChange = (key, value) => {
+    setLocalPreferences(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
 
   const handleSave = async () => {
-    setSaving(true);
+    setIsSaving(true);
+    setSaveSuccess(false);
+    
     try {
-      const response = await fetch('http://localhost:8000/users/profile', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8000/users/profile", {
+        method: "PATCH",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(profile)
+        body: JSON.stringify(localPreferences),
       });
-      
+
       if (response.ok) {
+        const data = await response.json();
+        onUpdate("preferred_languages", data.preferred_languages);
+        onUpdate("accessibility_needs", data.accessibility_needs);
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 2000);
       }
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      console.error("Error:", error);
     } finally {
-      setSaving(false);
+      setIsSaving(false);
     }
   };
-
-  const languageValues = Array.isArray(profile.preferred_languages) 
-    ? profile.preferred_languages 
-    : profile.preferred_languages?.split(',').filter(Boolean) || [];
-    
-  const accessibilityValues = Array.isArray(profile.accessibility_needs)
-    ? profile.accessibility_needs
-    : profile.accessibility_needs?.split(',').filter(Boolean) || [];
 
   return (
     <div className="space-y-6">
@@ -265,8 +278,8 @@ const QuickPreferences = ({ profile, onUpdate }) => {
           </label>
           <MultiSelect
             options={SUPPORTED_LANGUAGES}
-            value={languageValues}
-            onChange={(value) => onUpdate('preferred_languages', value)}
+            value={localPreferences.preferred_languages}
+            onChange={(value) => handleChange("preferred_languages", value)}
             placeholder="Select languages..."
           />
         </motion.div>
@@ -281,31 +294,21 @@ const QuickPreferences = ({ profile, onUpdate }) => {
           </label>
           <MultiSelect
             options={ACCESSIBILITY_OPTIONS}
-            value={accessibilityValues}
-            onChange={(value) => onUpdate('accessibility_needs', value)}
+            value={localPreferences.accessibility_needs}
+            onChange={(value) => handleChange("accessibility_needs", value)}
             placeholder="Select requirements..."
           />
         </motion.div>
       </div>
-      
-      <button
-        onClick={handleSave}
-        className="w-full animate-gradient text-white font-medium py-3 px-6 rounded-xl hover:opacity-90 transition-all hover:scale-[1.02] transform duration-200 flex items-center justify-center shadow-md"
-      >
-        {saving ? (
-          <div className="flex items-center gap-2">
-            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
-            Saving...
-          </div>
-        ) : saveSuccess ? (
-          <div className="flex items-center gap-2">
-            <Check className="h-5 w-5" />
-            Saved!
-          </div>
-        ) : (
-          'Save Preferences'
-        )}
-      </button>
+      <div className="flex justify-center lg:justify-end">
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="px-4 py-2 animate-gradient text-white rounded-xl transition-all disabled:opacity-50"
+        >
+          {isSaving ? "Saving..." : saveSuccess ? "Saved! ✓" : "Save Changes"}
+        </button>
+      </div>
     </div>
   );
 };
@@ -313,6 +316,11 @@ const QuickPreferences = ({ profile, onUpdate }) => {
 const CropperModal = ({ image, onCropComplete, onClose }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+
+  const handleCropComplete = (croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-4">
@@ -326,7 +334,7 @@ const CropperModal = ({ image, onCropComplete, onClose }) => {
             cropShape="round"
             onCropChange={setCrop}
             onZoomChange={setZoom}
-            onCropComplete={onCropComplete}
+            onCropComplete={handleCropComplete}
           />
         </div>
         <div className="flex justify-between">
@@ -336,18 +344,18 @@ const CropperModal = ({ image, onCropComplete, onClose }) => {
             min={1}
             max={3}
             step={0.1}
-            onChange={(e) => setZoom(e.target.value)}
+            onChange={(e) => setZoom(Number(e.target.value))}
             className="w-1/2"
           />
           <div className="space-x-2">
-            <button 
+            <button
               onClick={onClose}
               className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200"
             >
               Cancel
             </button>
-            <button 
-              onClick={() => onCropComplete(crop, zoom)}
+            <button
+              onClick={() => onCropComplete(croppedAreaPixels)}
               className="px-4 py-2 rounded-xl animate-gradient text-white"
             >
               Save
@@ -359,12 +367,20 @@ const CropperModal = ({ image, onCropComplete, onClose }) => {
   );
 };
 
-const ProfileHeader = ({ profile, trips }) => {
+const ProfileHeader = ({ profile, trips, onProfileUpdate }) => {
+  const { token } = useAuth();
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
-  const [profileImage, setProfileImage] = useState(localStorage.getItem('profileImage'));
+  const [profileImage, setProfileImage] = useState(
+    localStorage.getItem("profileImage")
+  );
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState(profile.name || "Traveler");
+  const [editedDescription, setEditedDescription] = useState(
+    profile.description || "Adventure Seeker • Travel Enthusiast"
+  );
 
   const handleImageSelect = (e) => {
     const file = e.target.files?.[0];
@@ -377,24 +393,20 @@ const ProfileHeader = ({ profile, trips }) => {
     reader.readAsDataURL(file);
   };
 
-  const handleCropComplete = async (croppedArea, croppedAreaPixels) => {
+  const handleSaveCrop = async (croppedAreaPixels) => {
     setUploading(true);
-    
-    // Create a canvas to draw the cropped image
     const canvas = document.createElement('canvas');
     const image = new Image();
     image.src = selectedImage;
-    
+
     await new Promise((resolve) => {
       image.onload = resolve;
     });
-    // Set canvas size to match the cropped area
+
     canvas.width = croppedAreaPixels.width;
     canvas.height = croppedAreaPixels.height;
-    
+
     const ctx = canvas.getContext('2d');
-    
-    // Draw the cropped image
     ctx.drawImage(
       image,
       croppedAreaPixels.x,
@@ -406,35 +418,55 @@ const ProfileHeader = ({ profile, trips }) => {
       croppedAreaPixels.width,
       croppedAreaPixels.height
     );
-    // Convert to base64 and save
+
     const base64Image = canvas.toDataURL('image/jpeg');
     localStorage.setItem('profileImage', base64Image);
     setProfileImage(base64Image);
-    
     setCropModalOpen(false);
     setUploading(false);
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/users/profile", {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: editedName,
+          description: editedDescription,
+        }),
+      });
+
+      if (response.ok) {
+        const updatedProfile = await response.json();
+        onProfileUpdate(updatedProfile);
+        setIsEditing(false);
+      }
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    }
   };
 
   return (
     <>
       <div className="relative mb-8">
-        {/* Cover Photo */}
-        <div className="h-48 w-full rounded-2xl overflow-hidden">
+        <div className="h-48 w-full overflow-hidden">
           <div className="w-full h-full animate-gradient"></div>
         </div>
-        
-        {/* Profile Info Container */}
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative -mt-24 sm:-mt-32 flex flex-col items-center">
-            {/* Profile Picture */}
             <div className="relative group">
               <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-white overflow-hidden bg-white shadow-lg">
-                <img 
+                <img
                   src={profileImage || "/default-avatar.png"}
                   alt="Profile"
                   className="w-full h-full object-cover"
                 />
-                <button 
+                <button
                   onClick={() => fileInputRef.current?.click()}
                   className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
@@ -453,41 +485,54 @@ const ProfileHeader = ({ profile, trips }) => {
                 className="hidden"
               />
             </div>
-
-            {/* User Info */}
-            <h1 className="mt-4 text-3xl font-bold text-gray-900">{profile.name || 'Traveler'}</h1>
-            <p className="text-gray-600">Adventure Seeker • Travel Enthusiast</p>
-
-            {/* Stats */}
-            <div className="mt-6 flex gap-8">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-500">{trips?.length || 0}</div>
-                <div className="text-sm text-gray-600">Trips</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-500">
-                  {[...new Set(trips?.map(trip => trip.destination.split(',').pop().trim()) || [])].length}
+            {isEditing ? (
+              <div className="mt-4 space-y-4 w-full max-w-md">
+                <input
+                  type="text"
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  className="w-full text-center text-3xl font-bold text-gray-900 bg-white rounded-xl border border-gray-200 px-4 py-2"
+                />
+                <input
+                  type="text"
+                  value={editedDescription}
+                  onChange={(e) => setEditedDescription(e.target.value)}
+                  className="w-full text-center text-gray-600 bg-white rounded-xl border border-gray-200 px-4 py-2"
+                />
+                <div className="flex justify-center gap-2">
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveProfile}
+                    className="px-4 py-2 rounded-xl bg-green-500 text-white hover:bg-green-600"
+                  >
+                    Save
+                  </button>
                 </div>
-                <div className="text-sm text-gray-600">Countries</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-500">
-                  {trips?.reduce((total, trip) => {
-                    const start = new Date(trip.start_date);
-                    const end = new Date(trip.end_date);
-                    return total + Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-                  }, 0) || 0}
-                </div>
-                <div className="text-sm text-gray-600">Travel Days</div>
+            ) : (
+              <div className="mt-4 text-center">
+                <h1 className="text-3xl font-bold text-gray-900">{editedName}</h1>
+                <p className="text-gray-600">{editedDescription}</p>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="mt-2 text-sm text-green-500 hover:text-green-600"
+                >
+                  Edit Profile
+                </button>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
       {cropModalOpen && (
         <CropperModal
           image={selectedImage}
-          onCropComplete={handleCropComplete}
+          onCropComplete={handleSaveCrop}
           onClose={() => setCropModalOpen(false)}
         />
       )}
@@ -495,34 +540,30 @@ const ProfileHeader = ({ profile, trips }) => {
   );
 };
 
-export default function UserProfile() {
+const UserProfile = () => {
   const { token } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState({});
+  const [profile, setProfile] = useState({
+    name: "Jordan",
+    description: "Adventure Seeker • Donut Connoisseur",
+    preferred_languages: ["en"],
+    accessibility_needs: []
+  });
   const [trips, setTrips] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [profileRes, tripsRes] = await Promise.all([
-          fetch('http://localhost:8000/users/profile', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }),
-          fetch('http://localhost:8000/trips', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          })
-        ]);
+        const tripsRes = await fetch("http://localhost:8000/trips", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        if (profileRes.ok && tripsRes.ok) {
-          const [profileData, tripsData] = await Promise.all([
-            profileRes.json(),
-            tripsRes.json()
-          ]);
-          setProfile(profileData);
+        if (tripsRes.ok) {
+          const tripsData = await tripsRes.json();
           setTrips(tripsData);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching trips:", error);
       } finally {
         setLoading(false);
       }
@@ -532,17 +573,30 @@ export default function UserProfile() {
   }, [token]);
 
   return (
-    <motion.div
-      initial={{ x: 300, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -300, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+    <motion.div      initial={{ y: 50, scale: 0.95, opacity: 0 }}
+      animate={{ y: 0, scale: 1, opacity: 1 }}
+      exit={{ y: -50, scale: 0.95, opacity: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 20,
+        mass: 1,
+      }}
     >
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pt-navbar pb-16">
-        <ProfileHeader profile={profile} trips={trips} />
+        <ProfileHeader 
+          profile={profile} 
+          trips={trips} 
+          onProfileUpdate={(newProfileData) => {
+            setProfile(prev => ({
+              ...prev,
+              ...newProfileData
+            }));
+          }}
+        />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <DashboardSection 
-            title="Travel Overview" 
+          <DashboardSection
+            title="Travel Overview"
             icon={<Globe className="w-6 h-6 text-green-500" />}
           >
             <TravelStats trips={trips} />
@@ -577,4 +631,6 @@ export default function UserProfile() {
       </div>
     </motion.div>
   );
-}
+};
+
+export default UserProfile;

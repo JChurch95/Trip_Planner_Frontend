@@ -289,13 +289,17 @@ export default function Home() {
     setDateRange(range);
     setShowCalendar(false);
   };
-
   return (
     <motion.div
-      initial={{ x: 300, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -300, opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      initial={{ y: 50, scale: 0.95, opacity: 0 }}
+      animate={{ y: 0, scale: 1, opacity: 1 }}
+      exit={{ y: -50, scale: 0.95, opacity: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 20,
+        mass: 1
+      }}
     >
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-navbar pb-16">
@@ -375,6 +379,7 @@ export default function Home() {
             </button>
           </div>
         </div>
+
         {/* Details Modal */}
         {showDetailsModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

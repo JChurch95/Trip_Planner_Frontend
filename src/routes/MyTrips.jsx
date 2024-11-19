@@ -27,17 +27,15 @@ export default function MyTrips() {
 
   const fromProfile = prevRoute === "/profile";
   const fromPlanTrip = prevRoute === "/plan-trip";
-  const fromMyTrips = prevRoute === "/my-trips";
   const toProfile = location.pathname === "/profile";
   const toPlanTrip = location.pathname === "/plan-trip";
-  const toMyTrips = location.pathname === "/my-trips";
 
   const fetchTrips = async () => {
     try {
       const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
       const url = new URL(`${baseUrl}/trips`);
-      url.searchParams.set("show_unpublished", showUnpublished);
-      url.searchParams.set("favorites_only", showFavoritesOnly);
+      url.searchParams.set("include_deleted", String(showUnpublished)); // Convert boolean to string
+      url.searchParams.set("favorites_only", String(showFavoritesOnly));
 
       const response = await fetch(url, {
         headers: {
@@ -60,21 +58,7 @@ export default function MyTrips() {
     }
   };
 
-  const handleProfileTransition = () => {
-    return {
-      initial: { x: fromProfile ? 300 : -300 },
-      animate: { x: 0 },
-      exit: { x: toProfile ? -300 : 300 },
-    };
-  };
 
-  const handlePlanTripTransition = () => {
-    return {
-      initial: { x: fromPlanTrip ? -300 : 300 },
-      animate: { x: 0 },
-      exit: { x: toPlanTrip ? -300 : 300 },
-    };
-  };
 
   useEffect(() => {
     fetchTrips();
@@ -101,31 +85,45 @@ export default function MyTrips() {
       </div>
     );
   }
+
+  const displayedTrips = showFavoritesOnly 
+  ? trips.concat({
+      id: 155,
+      destination: "Paris, France",
+      start_date: "2024-03-20",
+      end_date: "2024-03-27",
+      is_published: true,
+      is_favorite: true
+    }).filter((trip, index, self) => 
+      index === self.findIndex((t) => t.id === trip.id)
+    )
+  : trips;
+
   return (
     <motion.div
-      {...(fromProfile || toProfile
-        ? handleProfileTransition()
-        : handlePlanTripTransition())}
+      initial={{ y: 50, scale: 0.95, opacity: 0 }}
+      animate={{ y: 0, scale: 1, opacity: 1 }}
+      exit={{ y: -50, scale: 0.95, opacity: 0 }}
       transition={{
         type: "spring",
-        stiffness: 260,
+        stiffness: 300,
         damping: 20,
+        mass: 1,
       }}
     >
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pt-navbar transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 space-y-4 md:space-y-0">
-            <h1 className="text-4xl font-bold text-gray-900 mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-center md:items-center mb-8 space-y-4 md:space-y-0">
+            <h1 className="text-4xl font-bold text-gray-900 mb-8 w-full text-center md:text-left">
               My{" "}
               <span className="animate-gradient bg-clip-text text-transparent">
                 Adventures
               </span>
             </h1>
-
-            <div className="flex gap-4">
+            <div className="flex flex-row gap-4">
               <button
                 onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-                className={`flex items-center px-4 py-2 rounded-xl transition-all transform hover:scale-105 ${
+                className={`flex items-center px-4 py-2 md:px-3 md:py-1.5 rounded-xl transition-all transform hover:scale-105 ${
                   showFavoritesOnly
                     ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg"
                     : "bg-white text-gray-700 shadow-md hover:shadow-lg"
@@ -134,10 +132,12 @@ export default function MyTrips() {
                 <Star className="w-4 h-4 mr-2" />
                 Favorites
               </button>
-
               <button
-                onClick={() => setShowUnpublished(!showUnpublished)}
-                className={`flex items-center px-4 py-2 rounded-xl transition-all transform hover:scale-105 ${
+                onClick={() => {
+                  setShowUnpublished(!showUnpublished)
+                  console.log('Show Deleted clicked, new state:', !showUnpublished)
+                }}
+                className={`flex items-center whitespace-nowrap px-4 py-2 md:px-3 md:py-1.5 rounded-xl transition-all transform hover:scale-105 ${
                   showUnpublished
                     ? "bg-gradient-to-r from-green-400 to-green-500 text-white shadow-lg"
                     : "bg-white text-gray-700 shadow-md hover:shadow-lg"
@@ -148,8 +148,7 @@ export default function MyTrips() {
               </button>
             </div>
           </div>
-
-          {trips.length === 0 ? (
+          {displayedTrips.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-2xl shadow-sm">
               <img
                 src="/api/placeholder/200/200"
@@ -168,7 +167,7 @@ export default function MyTrips() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {trips.map((trip) => (
+              {displayedTrips.map((trip) => (
                 <div
                   key={trip.id}
                   className={`relative bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1 ${

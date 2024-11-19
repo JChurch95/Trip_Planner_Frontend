@@ -7,10 +7,11 @@ const DeleteTripButton = ({ tripId, onSuccess }) => {
   const handleDelete = async () => {
     setIsDeleting(true);
     const token = sessionStorage.getItem('sb-access-token');
+    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
     try {
-      const response = await fetch(`http://localhost:8000/trips/${tripId}/publish?publish=false`, {
-        method: 'PUT',
+      const response = await fetch(`${baseUrl}/trips/${tripId}`, {
+        method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -36,12 +37,12 @@ const DeleteTripButton = ({ tripId, onSuccess }) => {
     <button
       onClick={handleDelete}
       disabled={isDeleting}
-      className={`p-2 rounded-full text-red-500 hover:bg-red-50 transition-colors ${
+      className={`p-2 rounded-full text-red-600 hover:bg-red-50 transition-colors ${
         isDeleting ? 'opacity-50 cursor-not-allowed' : ''
       }`}
       title="Delete Trip"
     >
-      <Trash2 className="w-5 h-5" />
+      <Trash2 className={`w-5 h-5 ${isDeleting ? 'opacity-50' : ''}`} />
     </button>
   );
 };
