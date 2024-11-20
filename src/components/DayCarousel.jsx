@@ -1,6 +1,15 @@
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Coffee, Building, Utensils, Sunset, Star, ArrowRight } from 'lucide-react';
-import styles from '../routes/Itinerary.module.css';
+import React, { useState } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Coffee,
+  Building,
+  Utensils,
+  Sunset,
+  Star,
+  ArrowRight,
+} from "lucide-react";
+import styles from "../routes/Itinerary.module.css";
 
 const ActivityCard = ({ activity, time, icon: Icon }) => (
   <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
@@ -10,7 +19,9 @@ const ActivityCard = ({ activity, time, icon: Icon }) => (
       </div>
       <div className="ml-3 flex justify-between items-start flex-grow">
         <div>
-          <h4 className="font-medium text-gray-900">{activity.activity || activity.spot}</h4>
+          <h4 className="font-medium text-gray-900">
+            {activity.activity || activity.spot}
+          </h4>
           {time && <p className="text-sm text-gray-500">{time}</p>}
         </div>
         {activity.rating && (
@@ -22,12 +33,12 @@ const ActivityCard = ({ activity, time, icon: Icon }) => (
       </div>
     </div>
     <p className="text-gray-600 text-sm">{activity.description}</p>
-    
+
     <div className="flex items-center justify-end mt-3">
       {activity.url && (
-        <a 
-          href={activity.url} 
-          target="_blank" 
+        <a
+          href={activity.url}
+          target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 hover:text-blue-700 font-medium flex items-center"
         >
@@ -39,17 +50,18 @@ const ActivityCard = ({ activity, time, icon: Icon }) => (
   </div>
 );
 
-const DayCarousel = ({ dailySchedule }) => {  const [currentIndex, setCurrentIndex] = useState(0);
+const DayCarousel = ({ dailySchedule }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
 
   const next = () => {
-    setCurrentIndex((prevIndex) => 
+    setCurrentIndex((prevIndex) =>
       prevIndex === dailySchedule.length - 1 ? 0 : prevIndex + 1
     );
   };
 
   const prev = () => {
-    setCurrentIndex((prevIndex) => 
+    setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? dailySchedule.length - 1 : prevIndex - 1
     );
   };
@@ -57,17 +69,18 @@ const DayCarousel = ({ dailySchedule }) => {  const [currentIndex, setCurrentInd
   const day = dailySchedule[currentIndex];
 
   return (
-    <div 
+    <div
       className="relative max-w-5xl mx-auto"
       onTouchStart={(e) => {
         const touch = e.touches[0];
+
         setTouchStart(touch.clientX);
       }}
       onTouchMove={(e) => {
         if (!touchStart) return;
         const touch = e.touches[0];
         const diff = touchStart - touch.clientX;
-        
+
         if (Math.abs(diff) > 50) {
           if (diff > 0) {
             next();
@@ -109,10 +122,10 @@ const DayCarousel = ({ dailySchedule }) => {  const [currentIndex, setCurrentInd
             Day {currentIndex + 1}
             {day.date && (
               <span className="text-gray-500 ml-2">
-                {new Date(day.date).toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  month: 'long',
-                  day: 'numeric'
+                {new Date(day.date).toLocaleDateString("en-US", {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
                 })}
               </span>
             )}
@@ -124,13 +137,14 @@ const DayCarousel = ({ dailySchedule }) => {  const [currentIndex, setCurrentInd
             {/* Morning */}
             <div className="space-y-4">
               <h3 className="font-medium text-gray-500 mb-4">Morning</h3>
-              <ActivityCard 
+              <ActivityCard
                 activity={day.breakfast}
                 time="Breakfast"
                 icon={Coffee}
               />
-              <ActivityCard 
+              <ActivityCard
                 activity={day.morning_activity}
+                time="Morning Activity"
                 icon={Building}
               />
             </div>
@@ -138,13 +152,10 @@ const DayCarousel = ({ dailySchedule }) => {  const [currentIndex, setCurrentInd
             {/* Afternoon */}
             <div className="space-y-4">
               <h3 className="font-medium text-gray-500 mb-4">Afternoon</h3>
-              <ActivityCard 
-                activity={day.lunch}
-                time="Lunch"
-                icon={Utensils}
-              />
-              <ActivityCard 
+              <ActivityCard activity={day.lunch} time="Lunch" icon={Utensils} />
+              <ActivityCard
                 activity={day.afternoon_activity}
+                time="Afternoon Activity"
                 icon={Building}
               />
             </div>
@@ -152,13 +163,14 @@ const DayCarousel = ({ dailySchedule }) => {  const [currentIndex, setCurrentInd
             {/* Evening */}
             <div className="space-y-4">
               <h3 className="font-medium text-gray-500 mb-4">Evening</h3>
-              <ActivityCard 
+              <ActivityCard
                 activity={day.dinner}
                 time="Dinner"
                 icon={Utensils}
               />
-              <ActivityCard 
+              <ActivityCard
                 activity={day.evening_activity}
+                time="Evening Activity"
                 icon={Sunset}
               />
             </div>
@@ -173,9 +185,9 @@ const DayCarousel = ({ dailySchedule }) => {  const [currentIndex, setCurrentInd
             key={index}
             onClick={() => setCurrentIndex(index)}
             className={`w-2 h-2 rounded-full transition-all ${
-              index === currentIndex 
-                ? 'bg-orange-500 w-6' 
-                : 'bg-gray-300 hover:bg-gray-400'
+              index === currentIndex
+                ? "bg-orange-500 w-6"
+                : "bg-gray-300 hover:bg-gray-400"
             }`}
           />
         ))}

@@ -499,7 +499,7 @@ export default function Home() {
                       }))
                     }
                     placeholder="Photography, Local Markets, Street Food..."
-                    className="w-full border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                 </div>
 
@@ -518,7 +518,7 @@ export default function Home() {
                       }))
                     }
                     placeholder="Vegetarian, Gluten-free, Halal..."
-                    className="w-full border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                 </div>
 
@@ -536,8 +536,7 @@ export default function Home() {
                       }))
                     }
                     placeholder="Special requests, must-see places, or other preferences..."
-                    className="w-full h-32 border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
-                  />
+                    className="w-full h-32 border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"                  />
                 </div>
               </div>
             </div>

@@ -10,7 +10,6 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import DeleteTripButton from "../components/DeleteTripButton";
-import RecoverTripButton from "../components/RecoverTripButton";
 import FavoriteButton from "../components/FavoriteButton";
 import { motion } from "framer-motion";
 import styles from "./MyTrips.module.css";
@@ -85,23 +84,7 @@ export default function MyTrips() {
     );
   }
 
-  //Hardcoded, will change later
-  const displayedTrips = showFavoritesOnly
-    ? trips
-        .concat({
-          id: 159,
-          destination: "Paris, France",
-          start_date: "2025-06-09",
-          end_date: "2025-06-14",
-          is_published: true,
-          is_favorite: true,
-        })
-        .filter(
-          (trip, index, self) =>
-            index === self.findIndex((t) => t.id === trip.id)
-        )
-    : trips;
-
+  const displayedTrips = showFavoritesOnly ? trips.filter(trip => trip.is_favorite) : trips;
   return (
     <motion.div
       initial={{ y: 50, scale: 0.95, opacity: 0 }}
@@ -134,23 +117,6 @@ export default function MyTrips() {
               >
                 <Star className="w-4 h-4 mr-2" />
                 Favorites
-              </button>
-              <button
-                onClick={() => {
-                  setShowUnpublished(!showUnpublished);
-                  console.log(
-                    "Show Deleted clicked, new state:",
-                    !showUnpublished
-                  );
-                }}
-                className={`flex items-center whitespace-nowrap px-4 py-2 md:px-3 md:py-1.5 rounded-xl transition-all transform hover:scale-105 ${
-                  showUnpublished
-                    ? "bg-gradient-to-r from-green-400 to-green-500 text-white shadow-lg"
-                    : "bg-white text-gray-700 shadow-md hover:shadow-lg"
-                }`}
-              >
-                <RefreshCw className="w-4 h-4 mr-2" />
-                {showUnpublished ? "Hide Deleted" : "Show Deleted"}
               </button>
             </div>
           </div>
@@ -213,18 +179,11 @@ export default function MyTrips() {
                       >
                         View Itinerary →
                       </Link>
-
-                      {trip.is_published ? (
-                        <DeleteTripButton
-                          tripId={trip.id}
-                          onSuccess={fetchTrips}
-                        />
-                      ) : (
-                        <RecoverTripButton
-                          tripId={trip.id}
-                          onSuccess={fetchTrips}
-                        />
-                      )}
+                      <DeleteTripButton
+                        tripId={trip.id}
+                        onSuccess={fetchTrips}
+                        isFavorite={trip.is_favorite}
+                      />
                     </div>
                   </div>
                 </div>
@@ -236,3 +195,4 @@ export default function MyTrips() {
     </motion.div>
   );
 }
+

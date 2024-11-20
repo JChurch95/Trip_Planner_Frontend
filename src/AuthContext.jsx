@@ -120,3 +120,14 @@ export const useAuth = () => {
   }
   return context;
 };
+
+// In your AuthContext
+const login = async (credentials) => {
+  const response = await fetch('/api/login', {
+    method: 'POST',
+    body: JSON.stringify(credentials)
+  });
+  const data = await response.json();
+  setUser(data.user);
+  setToken(data.token);
+};

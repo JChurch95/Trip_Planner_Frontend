@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 
-const DeleteTripButton = ({ tripId, onSuccess }) => {
+const DeleteTripButton = ({ tripId, onSuccess, isFavorite }) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -36,13 +36,15 @@ const DeleteTripButton = ({ tripId, onSuccess }) => {
   return (
     <button
       onClick={handleDelete}
-      disabled={isDeleting}
-      className={`p-2 rounded-full text-red-600 hover:bg-red-50 transition-colors ${
-        isDeleting ? 'opacity-50 cursor-not-allowed' : ''
-      }`}
-      title="Delete Trip"
+      disabled={isFavorite}
+      className={`${
+        isFavorite 
+          ? 'cursor-not-allowed opacity-50' 
+          : 'hover:text-red-600'
+      } text-red-500`}
+      title={isFavorite ? "Cannot delete favorited trips" : "Delete trip"}
     >
-      <Trash2 className={`w-5 h-5 ${isDeleting ? 'opacity-50' : ''}`} />
+      <Trash2 className="w-5 h-5" />
     </button>
   );
 };

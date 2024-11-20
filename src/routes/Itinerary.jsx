@@ -85,6 +85,9 @@ const ActivityCard = ({ activity, time, icon: Icon }) => (
       <div className="ml-3 flex justify-between items-start flex-grow">
         <div>
           <h4 className="font-medium text-gray-900">{activity.activity || activity.spot}</h4>
+          <span className="text-sm text-blue-600 font-medium">
+            {activity.time_of_day} Activity
+          </span>
           {time && <p className="text-sm text-gray-500">{time}</p>}
         </div>
         {activity.rating && (
@@ -112,6 +115,7 @@ const ActivityCard = ({ activity, time, icon: Icon }) => (
     </div>
   </div>
 );
+
 
 const TravelTipsSection = ({ tips }) => {
   if (!tips) return null;

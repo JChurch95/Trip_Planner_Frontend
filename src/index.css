@@ -2,16 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
-
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #ffffff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -30,8 +28,23 @@
 
 .animate-gradient {
   background-size: 400% 400%;
-  background-image: linear-gradient(to right, #22c55e, #22c55e, #f97316, #f97316, #22c55e, #22c55e, #f97316, #f97316, #22c55e);
+  background-image: linear-gradient(
+    to right,
+    #22c55e,
+    #22c55e,
+    #f97316,
+    #f97316,
+    #22c55e,
+    #22c55e,
+    #f97316,
+    #f97316,
+    #22c55e
+  );
   animation: gradient-shift 20s linear infinite;
 }
 
-
+html,body{
+  margin: 0;
+  padding: 0;
+ min-height: 100vh;
+}

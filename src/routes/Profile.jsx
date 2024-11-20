@@ -18,6 +18,8 @@ import { Link } from "react-router-dom";
 import London from "../media/London.png";
 import Tokyo from "../media/Tokyo.png";
 import Paris from "../media/Paris.png";
+import Sydney from "../media/Sydney.png";
+import Default_Trip from "../media/Default_Trip.png"
 import styles from "./Profile.module.css";
 
 const SUPPORTED_LANGUAGES = [
@@ -29,6 +31,10 @@ const SUPPORTED_LANGUAGES = [
 ];
 
 const ACCESSIBILITY_OPTIONS = [
+  {
+    value: "No Accessibility Requirements",
+    label: "No Accessibility Requirements",
+  },
   { value: "wheelchair", label: "Wheelchair Access Required" },
   { value: "limited-mobility", label: "Limited Mobility Accommodations" },
   { value: "visual-aids", label: "Visual Aids/Braille" },
@@ -167,7 +173,9 @@ const TripGallery = ({ trips }) => (
                   ? Tokyo
                   : trip.destination.includes("Paris")
                   ? Paris
-                  : London
+                  : trip.destination.includes("Sydney")
+                  ? Sydney 
+                  : Default_Trip 
               }
               alt={trip.destination}
               className="w-full h-full object-cover"
@@ -176,7 +184,7 @@ const TripGallery = ({ trips }) => (
           <div className="absolute inset-0 p-4 flex flex-col justify-between">
             <div className="flex justify-between items-start">
               <h3 className="text-white font-semibold">{trip.destination}</h3>
-              <button 
+              <button
                 className="text-white opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={(e) => {
                   e.preventDefault();
@@ -185,7 +193,7 @@ const TripGallery = ({ trips }) => (
                 <Share2 size={20} />
               </button>
             </div>
-            <div className="text-white text-sm">
+            <div className="text-white text-sm font-bold">
               {new Date(trip.start_date).toLocaleDateString()} -{" "}
               {new Date(trip.end_date).toLocaleDateString()}
             </div>
@@ -195,7 +203,6 @@ const TripGallery = ({ trips }) => (
     ))}
   </div>
 );
-
 
 const TravelGoals = () => {
   const [goals, setGoals] = useState([
@@ -231,7 +238,7 @@ const TravelGoals = () => {
 
         <button
           onClick={addGoal}
-          className="px-4 py-2 rounded-xl bg-green-500 text-white hover:bg-green-600"
+          className="px-4 py-2 rounded-xl animate-gradient text-white"
         >
           Add Goal
         </button>
@@ -259,13 +266,24 @@ const TravelGoals = () => {
   );
 };
 const QuickPreferences = ({ profile, onUpdate }) => {
-  const { token } = useAuth();
-  const [localPreferences, setLocalPreferences] = useState({
-    preferred_languages: profile.preferred_languages || [],
-    accessibility_needs: profile.accessibility_needs || [],
+  const { token, user } = useAuth();
+  const [localPreferences, setLocalPreferences] = useState(() => {
+    const savedPrefs = localStorage.getItem("userPreferences");
+    return savedPrefs
+      ? JSON.parse(savedPrefs)
+      : {
+          preferred_languages: profile.preferred_languages || [],
+          accessibility_needs: profile.accessibility_needs || [],
+        };
   });
+
+  useEffect(() => {
+    localStorage.setItem("userPreferences", JSON.stringify(localPreferences));
+  }, [localPreferences]);
+
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   const handleChange = (key, value) => {
     setLocalPreferences((prev) => ({
@@ -293,7 +311,8 @@ const QuickPreferences = ({ profile, onUpdate }) => {
         onUpdate("preferred_languages", data.preferred_languages);
         onUpdate("accessibility_needs", data.accessibility_needs);
         setSaveSuccess(true);
-        setTimeout(() => setSaveSuccess(false), 2000);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -303,7 +322,7 @@ const QuickPreferences = ({ profile, onUpdate }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
@@ -346,6 +365,18 @@ const QuickPreferences = ({ profile, onUpdate }) => {
           {isSaving ? "Saving..." : saveSuccess ? "Saved! ✓" : "Save Changes"}
         </button>
       </div>
+
+      {showToast && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 flex items-center gap-2"
+        >
+          <Check className="h-5 w-5" />
+          <span>Changes saved successfully!</span>
+        </motion.div>
+      )}
     </div>
   );
 };
@@ -405,7 +436,8 @@ const CropperModal = ({ image, onCropComplete, onClose }) => {
 };
 
 const ProfileHeader = ({ profile, trips, onProfileUpdate }) => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  console.log("Current user:", user);
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [profileImage, setProfileImage] = useState(
@@ -582,12 +614,17 @@ const ProfileHeader = ({ profile, trips, onProfileUpdate }) => {
 const UserProfile = () => {
   const { token } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState({
-    name: "Jordan",
-    description: "Adventure Seeker • Donut Connoisseur",
-    preferred_languages: ["en"],
-    accessibility_needs: [],
+  const [profile, setProfile] = useState(() => {
+    const savedPrefs = localStorage.getItem("userPreferences");
+    return {
+      name: "Jordan",
+      description: "Adventure Seeker • Donut Connoisseur",
+      preferred_languages: ["en"],
+      accessibility_needs: [],
+      ...(savedPrefs ? JSON.parse(savedPrefs) : {}),
+    };
   });
+
   const [trips, setTrips] = useState([]);
 
   useEffect(() => {
@@ -600,6 +637,10 @@ const UserProfile = () => {
         if (tripsRes.ok) {
           const tripsData = await tripsRes.json();
           setTrips(tripsData);
+
+          // Add this to see what data we're getting back
+          console.log("Trips data:", tripsData);
+          console.log("Current token:", token);
         }
       } catch (error) {
         console.error("Error fetching trips:", error);
@@ -610,7 +651,6 @@ const UserProfile = () => {
 
     if (token) fetchData();
   }, [token]);
-
   return (
     <motion.div
       initial={{ y: 50, scale: 0.95, opacity: 0 }}
