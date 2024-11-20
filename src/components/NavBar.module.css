@@ -31,3 +31,13 @@
 .navbar-hidden {
   padding-top: 0;
 }
+
+.rabbitRouteTitle {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+}
+
+
+.outfitFont {
+  font-family: 'Outfit', sans-serif;
+}

@@ -34,20 +34,33 @@
   gap: 1.5rem;
   margin-bottom: 3rem;
 }
-
 .accommodationCard {
-  background: white;
-  border-radius: 1rem;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  border: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  backdrop-filter: blur(8px);
+  transition: box-shadow 0.3s ease;
 }
 
 .accommodationCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px -8px rgba(0,0,0,0.15);
+  box-shadow: 0 0 30px rgba(52, 211, 153, 0.3);
 }
 
+/* For the travel tips cards */
+.travelTipCard {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  backdrop-filter: blur(8px);
+  transition: box-shadow 0.3s ease;
+}
+
+.travelTipCard:hover {
+  box-shadow: 0 0 30px rgba(52, 211, 153, 0.3);
+}
 .cardHeader {
   padding: 1.5rem;
   border-bottom: 1px solid #f3f4f6;
@@ -186,4 +199,19 @@
   fill: currentColor;
   stroke: #000000;
   stroke-width: 1px;
+}
+
+/* Add these styles to your existing CSS module */
+.dailyScheduleSection {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  backdrop-filter: blur(8px);
+  transition: box-shadow 0.3s ease;
+}
+
+.dailyScheduleSection:hover {
+  box-shadow: 0 0 30px rgba(52, 211, 153, 0.3);
 }

@@ -14,7 +14,11 @@ import {
 import { motion } from "framer-motion";
 import { Listbox } from "@headlessui/react";
 import Cropper from "react-easy-crop";
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
+import London from "../media/London.png";
+import Tokyo from "../media/Tokyo.png";
+import Paris from "../media/Paris.png";
+import styles from "./Profile.module.css";
 
 const SUPPORTED_LANGUAGES = [
   { value: "en", label: "English" },
@@ -80,11 +84,7 @@ const DashboardSection = ({ title, icon, children }) => (
   <motion.div
     initial={{ y: 20, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
-    className="bg-white rounded-2xl shadow-sm p-6 mb-6 relative overflow-visible"
-    style={{
-      boxShadow:
-        "0 0 20px rgba(0, 0, 0, 0.05), 0 0 40px rgba(34, 197, 94, 0.03)",
-    }}
+    className={`bg-white rounded-2xl shadow-sm p-6 mb-6 relative overflow-visible ${styles.sectionCard}`}
   >
     <div className="absolute inset-0 bg-gradient-to-br from-green-50/30 to-orange-50/30 pointer-events-none" />
     <div className="relative">
@@ -99,33 +99,47 @@ const DashboardSection = ({ title, icon, children }) => (
 
 const TravelStats = ({ trips }) => {
   const stats = {
-    totalTrips: trips?.length || 0,
-    upcomingTrips:
-      trips?.filter((trip) => new Date(trip.start_date) > new Date()).length ||
-      0,
-    completedTrips:
-      trips?.filter((trip) => new Date(trip.end_date) < new Date()).length || 0,
-    countries: [
-      ...new Set(
-        trips?.map((trip) => trip.destination.split(",").pop().trim()) || []
-      ),
-    ].length,
+    totalTrips: {
+      value: trips?.length || 0,
+      label: "Total Trips",
+    },
+    upcomingTrips: {
+      value:
+        trips?.filter((trip) => new Date(trip.start_date) > new Date())
+          .length || 0,
+      label: "Upcoming Trips",
+    },
+    completedTrips: {
+      value:
+        trips?.filter((trip) => new Date(trip.end_date) < new Date()).length ||
+        0,
+      label: "Completed Trips",
+    },
+    countries: {
+      value: [
+        ...new Set(
+          trips?.map((trip) => trip.destination.split(",").pop().trim()) || []
+        ),
+      ].length,
+      label: "Countries",
+    },
   };
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {Object.entries(stats).map(([key, value], index) => (
+      {Object.entries(stats).map(([key, { value, label }], index) => (
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: index * 0.1 }}
           key={key}
-          className="aspect-square lg:aspect-auto"
         >
-          <div className="h-full lg:h-[120px] bg-gradient-to-br from-white to-gray-50 rounded-xl p-4 lg:p-6 flex flex-col justify-center items-center text-center">
-            <div className="text-3xl font-bold text-orange-500">{value}</div>
-            <div className="text-sm text-gray-600 mt-2 mx-auto">
-              {key.replace(/([A-Z])/g, " $1").trim()}
+          <div className="h-[120px] bg-gradient-to-br from-white to-gray-50 rounded-xl p-4 flex flex-col">
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-3xl font-bold text-orange-500">{value}</div>
+            </div>
+            <div className="h-[36px] flex items-center justify-center text-center w-full">
+              <div className="text-sm text-gray-600 px-1">{label}</div>
             </div>
           </div>
         </motion.div>
@@ -133,33 +147,55 @@ const TravelStats = ({ trips }) => {
     </div>
   );
 };
+
 const TripGallery = ({ trips }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     {trips?.map((trip, index) => (
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: index * 0.1 }}
-        key={trip.id}
-        className="group relative rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all"
-      >
-        <div className="aspect-video bg-gradient-to-br from-green-500 to-orange-500 opacity-90"></div>
-        <div className="absolute inset-0 p-4 flex flex-col justify-between">
-          <div className="flex justify-between items-start">
-            <h3 className="text-white font-semibold">{trip.destination}</h3>
-            <button className="text-white opacity-0 group-hover:opacity-100 transition-opacity">
-              <Share2 size={20} />
-            </button>
+      <Link to={`/itinerary/${trip.id}`} key={trip.id}>
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: index * 0.1 }}
+          className={`group relative rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer ${styles.tripCard}`}
+        >
+          <div className="aspect-video">
+            <img
+              src={
+                trip.destination.includes("London")
+                  ? London
+                  : trip.destination.includes("Tokyo")
+                  ? Tokyo
+                  : trip.destination.includes("Paris")
+                  ? Paris
+                  : London
+              }
+              alt={trip.destination}
+              className="w-full h-full object-cover"
+            />
           </div>
-          <div className="text-white text-sm">
-            {new Date(trip.start_date).toLocaleDateString()} -{" "}
-            {new Date(trip.end_date).toLocaleDateString()}
+          <div className="absolute inset-0 p-4 flex flex-col justify-between">
+            <div className="flex justify-between items-start">
+              <h3 className="text-white font-semibold">{trip.destination}</h3>
+              <button 
+                className="text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => {
+                  e.preventDefault();
+                }}
+              >
+                <Share2 size={20} />
+              </button>
+            </div>
+            <div className="text-white text-sm">
+              {new Date(trip.start_date).toLocaleDateString()} -{" "}
+              {new Date(trip.end_date).toLocaleDateString()}
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </Link>
     ))}
   </div>
 );
+
 
 const TravelGoals = () => {
   const [goals, setGoals] = useState([
@@ -190,8 +226,9 @@ const TravelGoals = () => {
           value={newGoal}
           onChange={(e) => setNewGoal(e.target.value)}
           placeholder="Add a new travel goal..."
-          className="flex-grow rounded-xl border border-gray-200 px-4 py-2 text-gray-900"
+          className="flex-grow rounded-xl border border-gray-200 px-4 py-2 text-white"
         />
+
         <button
           onClick={addGoal}
           className="px-4 py-2 rounded-xl bg-green-500 text-white hover:bg-green-600"
@@ -225,22 +262,22 @@ const QuickPreferences = ({ profile, onUpdate }) => {
   const { token } = useAuth();
   const [localPreferences, setLocalPreferences] = useState({
     preferred_languages: profile.preferred_languages || [],
-    accessibility_needs: profile.accessibility_needs || []
+    accessibility_needs: profile.accessibility_needs || [],
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const handleChange = (key, value) => {
-    setLocalPreferences(prev => ({
+    setLocalPreferences((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     setSaveSuccess(false);
-    
+
     try {
       const response = await fetch("http://localhost:8000/users/profile", {
         method: "PATCH",
@@ -395,7 +432,7 @@ const ProfileHeader = ({ profile, trips, onProfileUpdate }) => {
 
   const handleSaveCrop = async (croppedAreaPixels) => {
     setUploading(true);
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     const image = new Image();
     image.src = selectedImage;
 
@@ -406,7 +443,7 @@ const ProfileHeader = ({ profile, trips, onProfileUpdate }) => {
     canvas.width = croppedAreaPixels.width;
     canvas.height = croppedAreaPixels.height;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     ctx.drawImage(
       image,
       croppedAreaPixels.x,
@@ -419,8 +456,8 @@ const ProfileHeader = ({ profile, trips, onProfileUpdate }) => {
       croppedAreaPixels.height
     );
 
-    const base64Image = canvas.toDataURL('image/jpeg');
-    localStorage.setItem('profileImage', base64Image);
+    const base64Image = canvas.toDataURL("image/jpeg");
+    localStorage.setItem("profileImage", base64Image);
     setProfileImage(base64Image);
     setCropModalOpen(false);
     setUploading(false);
@@ -516,7 +553,9 @@ const ProfileHeader = ({ profile, trips, onProfileUpdate }) => {
               </div>
             ) : (
               <div className="mt-4 text-center">
-                <h1 className="text-3xl font-bold text-gray-900">{editedName}</h1>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {editedName}
+                </h1>
                 <p className="text-gray-600">{editedDescription}</p>
                 <button
                   onClick={() => setIsEditing(true)}
@@ -547,7 +586,7 @@ const UserProfile = () => {
     name: "Jordan",
     description: "Adventure Seeker • Donut Connoisseur",
     preferred_languages: ["en"],
-    accessibility_needs: []
+    accessibility_needs: [],
   });
   const [trips, setTrips] = useState([]);
 
@@ -573,7 +612,8 @@ const UserProfile = () => {
   }, [token]);
 
   return (
-    <motion.div      initial={{ y: 50, scale: 0.95, opacity: 0 }}
+    <motion.div
+      initial={{ y: 50, scale: 0.95, opacity: 0 }}
       animate={{ y: 0, scale: 1, opacity: 1 }}
       exit={{ y: -50, scale: 0.95, opacity: 0 }}
       transition={{
@@ -584,35 +624,38 @@ const UserProfile = () => {
       }}
     >
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pt-navbar pb-16">
-        <ProfileHeader 
-          profile={profile} 
-          trips={trips} 
+        <ProfileHeader
+          profile={profile}
+          trips={trips}
           onProfileUpdate={(newProfileData) => {
-            setProfile(prev => ({
+            setProfile((prev) => ({
               ...prev,
-              ...newProfileData
+              ...newProfileData,
             }));
           }}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <DashboardSection
-            title="Travel Overview"
-            icon={<Globe className="w-6 h-6 text-green-500" />}
-          >
-            <TravelStats trips={trips} />
-          </DashboardSection>
+          {/* Two-column grid for first two sections */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <DashboardSection
+              title="Travel Overview"
+              icon={<Globe className="w-6 h-6 text-green-500" />}
+            >
+              <TravelStats trips={trips} />
+            </DashboardSection>
 
-          <DashboardSection
-            title="Quick Preferences"
-            icon={<User className="w-6 h-6 text-orange-500" />}
-          >
-            <QuickPreferences
-              profile={profile}
-              onUpdate={(key, value) =>
-                setProfile((prev) => ({ ...prev, [key]: value }))
-              }
-            />
-          </DashboardSection>
+            <DashboardSection
+              title="Quick Preferences"
+              icon={<User className="w-6 h-6 text-orange-500" />}
+            >
+              <QuickPreferences
+                profile={profile}
+                onUpdate={(key, value) =>
+                  setProfile((prev) => ({ ...prev, [key]: value }))
+                }
+              />
+            </DashboardSection>
+          </div>
 
           <DashboardSection
             title="Your Trips"
@@ -634,3 +677,4 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
+TravelStats;

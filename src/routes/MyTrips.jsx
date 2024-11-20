@@ -13,6 +13,7 @@ import DeleteTripButton from "../components/DeleteTripButton";
 import RecoverTripButton from "../components/RecoverTripButton";
 import FavoriteButton from "../components/FavoriteButton";
 import { motion } from "framer-motion";
+import styles from "./MyTrips.module.css";
 
 export default function MyTrips() {
   const [trips, setTrips] = useState([]);
@@ -58,8 +59,6 @@ export default function MyTrips() {
     }
   };
 
-
-
   useEffect(() => {
     fetchTrips();
   }, [token, showUnpublished, showFavoritesOnly]);
@@ -86,18 +85,22 @@ export default function MyTrips() {
     );
   }
 
-  const displayedTrips = showFavoritesOnly 
-  ? trips.concat({
-      id: 155,
-      destination: "Paris, France",
-      start_date: "2024-03-20",
-      end_date: "2024-03-27",
-      is_published: true,
-      is_favorite: true
-    }).filter((trip, index, self) => 
-      index === self.findIndex((t) => t.id === trip.id)
-    )
-  : trips;
+  //Hardcoded, will change later
+  const displayedTrips = showFavoritesOnly
+    ? trips
+        .concat({
+          id: 159,
+          destination: "Paris, France",
+          start_date: "2025-06-09",
+          end_date: "2025-06-14",
+          is_published: true,
+          is_favorite: true,
+        })
+        .filter(
+          (trip, index, self) =>
+            index === self.findIndex((t) => t.id === trip.id)
+        )
+    : trips;
 
   return (
     <motion.div
@@ -134,8 +137,11 @@ export default function MyTrips() {
               </button>
               <button
                 onClick={() => {
-                  setShowUnpublished(!showUnpublished)
-                  console.log('Show Deleted clicked, new state:', !showUnpublished)
+                  setShowUnpublished(!showUnpublished);
+                  console.log(
+                    "Show Deleted clicked, new state:",
+                    !showUnpublished
+                  );
                 }}
                 className={`flex items-center whitespace-nowrap px-4 py-2 md:px-3 md:py-1.5 rounded-xl transition-all transform hover:scale-105 ${
                   showUnpublished
@@ -172,7 +178,7 @@ export default function MyTrips() {
                   key={trip.id}
                   className={`relative bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1 ${
                     !trip.is_published ? "opacity-75" : ""
-                  }`}
+                  } ${styles.tripCard}`}
                 >
                   <FavoriteButton
                     tripId={trip.id}

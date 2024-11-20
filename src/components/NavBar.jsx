@@ -18,17 +18,20 @@ const NavBar = () => {
     const handleScroll = () => {
       const currentScrollPos = window.scrollY;
       setIsScrolled(currentScrollPos > 20);
-      
+
       // Only show navbar when user is at the very top
       if (currentScrollPos < 10) {
         setVisible(true);
         setPrevScrollPos(currentScrollPos);
         return;
       }
-
       // Keep navbar hidden until user reaches top
       setVisible(false);
     };
+
+    <h1 className="font-outfit text-4xl font-bold bg-gradient-to-r from-green-500 to-orange-500 bg-clip-text text-transparent">
+      Rabbit Route
+    </h1>;
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -55,17 +58,18 @@ const NavBar = () => {
       (item === "My Trips" && location.pathname.includes("/itinerary"))
     );
   };
+
   return (
     <motion.nav
       initial={{ y: -100 }}
-      animate={{ 
+      animate={{
         y: visible ? 0 : -100,
-        opacity: visible ? 1 : 0
+        opacity: visible ? 1 : 0,
       }}
       transition={{ duration: 0.3 }}
       className={`fixed w-full z-50 transition-all duration-300 ${
         isScrolled ? "bg-white/95 backdrop-blur-sm shadow-lg" : "bg-transparent"
-      } ${styles['content-shift']} ${!visible ? styles['navbar-hidden'] : ''}`}
+      } ${styles["content-shift"]} ${!visible ? styles["navbar-hidden"] : ""}`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Logo Section */}
@@ -133,8 +137,20 @@ const NavBar = () => {
                          M70 67 L85 67
                          M70 69 L85 74"
                     />
-                    <circle cx="30" cy="65" r="3" fill="#FFB6C1" opacity="0.5" />
-                    <circle cx="70" cy="65" r="3" fill="#FFB6C1" opacity="0.5" />
+                    <circle
+                      cx="30"
+                      cy="65"
+                      r="3"
+                      fill="#FFB6C1"
+                      opacity="0.5"
+                    />
+                    <circle
+                      cx="70"
+                      cy="65"
+                      r="3"
+                      fill="#FFB6C1"
+                      opacity="0.5"
+                    />
                   </svg>
                 </div>
               </motion.div>
@@ -149,6 +165,7 @@ const NavBar = () => {
             </div>
           </Link>
         </div>
+
         {/* Navigation Tabs - Desktop */}
         <div className="hidden md:block border-t border-gray-100">
           <div className="flex justify-center items-center space-x-8 py-4">
@@ -170,7 +187,10 @@ const NavBar = () => {
                 </Link>
               </motion.div>
             ))}
-            <motion.div whileHover={{ y: -2, scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <motion.div
+              whileHover={{ y: -2, scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <button
                 className="px-6 py-2 rounded-full font-medium transition-all text-gray-700 hover:text-orange-500 hover:bg-gray-50"
                 onClick={handleLogout}
@@ -180,6 +200,7 @@ const NavBar = () => {
             </motion.div>
           </div>
         </div>
+
         {/* Mobile Menu Button */}
         <button
           className="md:hidden absolute top-4 right-4 p-2"

@@ -5,8 +5,9 @@ import { useAuth } from "../AuthContext";
 import styles from "./Home.module.css";
 import { motion } from "framer-motion";
 
-// Keep your original constants
+// Sample Locations, will need to add the ability for it to autofill anything after Demo Day
 const SAMPLE_LOCATIONS = [
+  "San Francisco, California",
   "New York City, United States",
   "Tokyo, Japan",
   "London, United Kingdom",
@@ -66,14 +67,12 @@ const MONTHS = [
   "December",
 ];
 
-// Calendar component remains the same but with updated styling
+// Calendar component
 function CalendarDropdown({ onSelect, onClose }) {
-  // ... [Keep your existing Calendar implementation] ...
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
 
-  // Keep all your existing calendar functions
   const getDaysInMonth = (year, month) => {
     return new Date(year, month + 1, 0).getDate();
   };
@@ -115,7 +114,6 @@ function CalendarDropdown({ onSelect, onClose }) {
   };
 
   const renderCalendar = () => {
-    // ... [Keep your existing calendar rendering logic] ...
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const daysInMonth = getDaysInMonth(year, month);
@@ -159,7 +157,9 @@ function CalendarDropdown({ onSelect, onClose }) {
   return (
     <div
       className={styles.calendarWrapper}
-      onClick={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
     >
       <div className={styles.calendarHeader}>
         <button
@@ -209,7 +209,7 @@ export default function Home() {
     traveler_type: "",
   });
 
-  // Keep all your existing handlers
+  // Handlers
   const handleFormSubmit = async () => {
     setIsCreatingTrip(true);
     try {
@@ -289,6 +289,7 @@ export default function Home() {
     setDateRange(range);
     setShowCalendar(false);
   };
+
   return (
     <motion.div
       initial={{ y: 50, scale: 0.95, opacity: 0 }}
@@ -298,10 +299,10 @@ export default function Home() {
         type: "spring",
         stiffness: 300,
         damping: 20,
-        mass: 1
+        mass: 1,
       }}
     >
-      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+      <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-navbar pb-16">
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
@@ -312,11 +313,11 @@ export default function Home() {
               </span>
             </h1>
           </div>
-          {/* Search Container */}
+
           <div className="max-w-3xl mx-auto space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
-              {/* Location Search */}
-              <div className="relative">
+              {/* Location Search with Suggestions */}
+              <div className={`relative ${styles.inputGlow} rounded-xl`}>
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-gray-400" />
                 </div>
@@ -331,8 +332,7 @@ export default function Home() {
                   placeholder="Where to?"
                   className="block w-full pl-10 pr-3 py-4 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm"
                 />
-
-                {/* Location Suggestions */}
+                {/* Location Suggestions Dropdown */}
                 {showLocations && searchText && (
                   <div className="absolute z-10 w-full mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
                     {filteredLocations.map((location) => (
@@ -348,8 +348,8 @@ export default function Home() {
                 )}
               </div>
 
-              {/* Date Selection */}
-              <div className="relative">
+              {/* Date Selection with Calendar */}
+              <div className={`relative ${styles.inputGlow} rounded-xl`}>
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Calendar className="h-5 w-5 text-gray-400" />
                 </div>
@@ -370,199 +370,196 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Generate Button */}
-            <button
-              onClick={handleGenerateClick}
-              className="w-full animate-gradient bg-gradient-to-r from-green-500 via-emerald-500 via-orange-400 to-orange-500 text-white font-medium py-4 px-6 rounded-xl hover:opacity-90 transition-all hover:scale-[1.02] transform duration-200 flex items-center justify-center group shadow-md"
-            >
-              Generate Itinerary
-            </button>
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={handleGenerateClick}
+                className="w-full md:w-1/2 animate-gradient bg-gradient-to-r from-green-500 via-emerald-500 via-orange-400 to-orange-500 text-white font-medium py-4 px-6 rounded-xl hover:opacity-90 transition-all hover:scale-[1.02] transform duration-200 flex items-center justify-center group shadow-md"
+              >
+                Generate Itinerary
+              </button>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Details Modal */}
-        {showDetailsModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-              <div className="p-4 sm:p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  Tell us about your trip to {searchText}
-                </h2>
-              </div>
+      {/* Details Modal */}
+      {showDetailsModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Tell us about your trip to {searchText}
+              </h2>
+            </div>
 
-              <div className="p-4 sm:p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  {/* Left Column */}
-                  <div>
-                    {/* Traveler Type */}
-                    <div className="mb-4 sm:mb-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Who's traveling?
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {Object.entries(
-                          UI_TO_BACKEND_MAPPINGS.travelerType
-                        ).map(([display, value]) => (
-                          <button
-                            key={value}
-                            onClick={() =>
-                              setFormData((prev) => ({
-                                ...prev,
-                                traveler_type: value,
-                              }))
-                            }
-                            className={`p-2 sm:p-3 rounded-lg text-sm sm:text-base transition-all ${
-                              formData.traveler_type === value
-                                ? "bg-gradient-to-r from-green-500 to-orange-500 text-white"
-                                : "border border-gray-200 text-gray-700 hover:border-green-500"
-                            }`}
-                          >
-                            {display}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Activity Level */}
-                    <div className="mb-4 sm:mb-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        What's your preferred activity level?
-                      </label>
-                      <div className="grid grid-cols-1 gap-2">
-                        {Object.entries(
-                          UI_TO_BACKEND_MAPPINGS.activityLevel
-                        ).map(([display, value]) => (
-                          <button
-                            key={value}
-                            onClick={() =>
-                              setFormData((prev) => ({
-                                ...prev,
-                                activity_level: value,
-                              }))
-                            }
-                            className={`p-2 sm:p-3 rounded-lg text-sm sm:text-base transition-all ${
-                              formData.activity_level === value
-                                ? "bg-gradient-to-r from-green-500 to-orange-500 text-white"
-                                : "border border-gray-200 text-gray-700 hover:border-green-500"
-                            }`}
-                          >
-                            {display}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Budget Range */}
-                    <div className="mb-4 sm:mb-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        What's your budget range?
-                      </label>
-                      <div className="grid grid-cols-1 gap-2">
-                        {Object.entries(UI_TO_BACKEND_MAPPINGS.budgetRange).map(
-                          ([display, value]) => (
-                            <button
-                              key={value}
-                              onClick={() =>
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  budget_preference: value,
-                                }))
-                              }
-                              className={`p-2 sm:p-3 rounded-lg text-sm sm:text-base transition-all ${
-                                formData.budget_preference === value
-                                  ? "bg-gradient-to-r from-green-500 to-orange-500 text-white"
-                                  : "border border-gray-200 text-gray-700 hover:border-green-500"
-                              }`}
-                            >
-                              {display}
-                            </button>
-                          )
-                        )}
-                      </div>
-                    </div>
+            <div className="p-4 sm:p-6">
+              {/* Top Section - Single column */}
+              <div className="mb-6 max-w-xl mx-auto">
+                {/* Who's traveling */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
+                    Who's traveling?
+                  </label>
+                  <div className="grid grid-cols-1 gap-2 w-1/2 mx-auto">
+                    {Object.entries(UI_TO_BACKEND_MAPPINGS.travelerType).map(
+                      ([display, value]) => (
+                        <button
+                          key={value}
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              traveler_type: value,
+                            }))
+                          }
+                          className={`p-2 sm:p-3 rounded-lg text-sm sm:text-base transition-all ${
+                            formData.traveler_type === value || formData.activity_level === value || formData.budget_preference === value
+                              ? "animate-gradient bg-gradient-to-r from-green-500 via-emerald-500 via-orange-400 to-orange-500 text-white"
+                              : "border border-gray-200 text-gray-700 hover:border-green-500"
+                          }`}                        >
+                          {display}
+                        </button>
+                      )
+                    )}
                   </div>
+                </div>
 
-                  {/* Right Column */}
-                  <div>
-                    {/* Special Interests */}
-                    <div className="mb-4 sm:mb-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        What are your special interests?
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.special_interests || ""}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            special_interests: e.target.value,
-                          }))
-                        }
-                        placeholder="Photography, Local Markets, Street Food..."
-                        className="w-full border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      />
-                    </div>
+                {/* Activity Level */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
+                    What's your preferred activity level?
+                  </label>
+                  <div className="grid grid-cols-1 gap-2 w-1/2 mx-auto">
+                    {Object.entries(UI_TO_BACKEND_MAPPINGS.activityLevel).map(
+                      ([display, value]) => (
+                        <button
+                          key={value}
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              activity_level: value,
+                            }))
+                          }
+                          className={`p-2 sm:p-3 rounded-lg text-sm sm:text-base transition-all ${
+                            formData.activity_level === value
+                              ? "bg-gradient-to-r from-green-500 to-orange-500 text-white"
+                              : "border border-gray-200 text-gray-700 hover:border-green-500"
+                          }`}
+                        >
+                          {display}
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
 
-                    {/* Dietary Preferences */}
-                    <div className="mb-4 sm:mb-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Any dietary preferences?
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.dietary_preferences || ""}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            dietary_preferences: e.target.value,
-                          }))
-                        }
-                        placeholder="Vegetarian, Gluten-free, Halal..."
-                        className="w-full border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      />
-                    </div>
-
-                    {/* Additional Notes */}
-                    <div className="mb-4 sm:mb-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Anything else we should know?
-                      </label>
-                      <textarea
-                        value={formData.additional_notes || ""}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            additional_notes: e.target.value,
-                          }))
-                        }
-                        placeholder="Special requests, must-see places, or other preferences..."
-                        className="w-full h-[120px] sm:h-[158px] border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
-                      />
-                    </div>
+                {/* Budget Range */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
+                    What's your budget range?
+                  </label>
+                  <div className="grid grid-cols-1 gap-2 w-1/2 mx-auto">
+                    {Object.entries(UI_TO_BACKEND_MAPPINGS.budgetRange).map(
+                      ([display, value]) => (
+                        <button
+                          key={value}
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              budget_preference: value,
+                            }))
+                          }
+                          className={`p-2 sm:p-3 rounded-lg text-sm sm:text-base transition-all ${
+                            formData.budget_preference === value
+                              ? "bg-gradient-to-r from-green-500 to-orange-500 text-white"
+                              : "border border-gray-200 text-gray-700 hover:border-green-500"
+                          }`}
+                        >
+                          {display}
+                        </button>
+                      )
+                    )}
                   </div>
                 </div>
               </div>
 
-              <div className="p-4 sm:p-6 border-t border-gray-100 sticky bottom-0 bg-white">
-                <button
-                  onClick={handleFormSubmit}
-                  disabled={isCreatingTrip}
-                  className="w-full bg-gradient-to-r from-green-500 to-orange-500 text-white font-medium py-3 sm:py-4 px-6 rounded-xl hover:opacity-90 transition-all hover:scale-[1.02] transform duration-200 flex items-center justify-center group shadow-md text-sm sm:text-base"
-                >
-                  {isCreatingTrip ? (
-                    <div className="flex items-center">
-                      <div className="animate-spin mr-2 h-5 w-5 border-t-2 border-b-2 border-white rounded-full" />
-                      Creating your trip...
-                    </div>
-                  ) : (
-                    "Generate Itinerary"
-                  )}
-                </button>
+              {/* Bottom Section */}
+              <div className="space-y-4">
+                {/* Special Interests */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    What are your special interests?
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.special_interests || ""}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        special_interests: e.target.value,
+                      }))
+                    }
+                    placeholder="Photography, Local Markets, Street Food..."
+                    className="w-full border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Dietary Preferences */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Any dietary preferences?
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.dietary_preferences || ""}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        dietary_preferences: e.target.value,
+                      }))
+                    }
+                    placeholder="Vegetarian, Gluten-free, Halal..."
+                    className="w-full border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Additional Notes */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Anything else we should know?
+                  </label>
+                  <textarea
+                    value={formData.additional_notes || ""}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        additional_notes: e.target.value,
+                      }))
+                    }
+                    placeholder="Special requests, must-see places, or other preferences..."
+                    className="w-full h-32 border border-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                  />
+                </div>
               </div>
             </div>
+
+            <div className="p-4 sm:p-6 border-t border-gray-100 sticky bottom-0 bg-white">
+              <button
+                onClick={handleFormSubmit}
+                disabled={isCreatingTrip}
+                className="w-full md:w-1/2 mx-auto animate-gradient bg-gradient-to-r from-green-500 via-emerald-500 via-orange-400 to-orange-500 text-white font-medium py-4 px-6 rounded-xl hover:opacity-90 transition-all hover:scale-[1.02] transform duration-200 flex items-center justify-center group shadow-md"              >
+                {isCreatingTrip ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin mr-2 h-5 w-5 border-t-2 border-b-2 border-white rounded-full" />
+                    Creating your trip...
+                  </div>
+                ) : (
+                  "Generate Itinerary"
+                )}
+              </button>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </motion.div>
   );
 }

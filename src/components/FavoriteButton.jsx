@@ -20,8 +20,8 @@ const FavoriteButton = ({ tripId, initialFavorite = false, onSuccess, destinatio
       title={isFavorite ? "Remove from favorites" : "Add to favorites"}
     >
       <Star
-        className={`w-5 h-5 ${tripId === 155 ? 'text-yellow-500' : 'text-gray-400'}`}
-        fill={tripId === 155 ? "currentColor" : "none"}
+        className={`w-5 h-5 ${tripId === 159 ? 'text-yellow-500' : 'text-gray-400'}`}
+        fill={tripId === 159 ? "currentColor" : "none"}
       />
     </button>
   );

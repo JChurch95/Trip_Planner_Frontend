@@ -121,7 +121,7 @@ const TravelTipsSection = ({ tips }) => {
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Travel Tips</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Weather Tips */}
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-100">
+        <div className={`${styles.travelTipCard} p-6`}>
           <div className="flex items-center mb-4 text-blue-500">
             <Cloud className="w-6 h-6 mr-2" />
             <h3 className="font-semibold text-lg text-gray-900">Weather</h3>
@@ -130,7 +130,7 @@ const TravelTipsSection = ({ tips }) => {
         </div>
 
         {/* Transportation Tips */}
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-100">
+        <div className={`${styles.travelTipCard} p-6`}>
           <div className="flex items-center mb-4 text-green-500">
             <Bus className="w-6 h-6 mr-2" />
             <h3 className="font-semibold text-lg text-gray-900">Transportation</h3>
@@ -139,7 +139,7 @@ const TravelTipsSection = ({ tips }) => {
         </div>
 
         {/* Cultural Notes */}
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-100">
+        <div className={`${styles.travelTipCard} p-6`}>
           <div className="flex items-center mb-4 text-purple-500">
             <Globe className="w-6 h-6 mr-2" />
             <h3 className="font-semibold text-lg text-gray-900">Cultural Notes</h3>
@@ -150,7 +150,6 @@ const TravelTipsSection = ({ tips }) => {
     </section>
   );
 };
-
 export default function Itinerary() {
   const { tripId } = useParams();
   const { token } = useAuth();
@@ -277,7 +276,7 @@ export default function Itinerary() {
 
         {/* Daily Schedule */}
         {Array.isArray(itineraryData.daily_schedule) && itineraryData.daily_schedule.length > 0 && (
-          <section className="mb-12">
+          <section className={`mb-12 ${styles.dailyScheduleSection}`}>
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Daily Schedule</h2>
             <DayCarousel dailySchedule={itineraryData.daily_schedule} />
           </section>

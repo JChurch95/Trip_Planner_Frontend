@@ -9,7 +9,10 @@ export default {
       spacing: {
         'navbar': '330px',
         'navbar-sm': '130px'  // Smaller spacing for itinerary
-      }
+      },
+      fontFamily: {
+        outfit: ['Outfit', 'sans-serif'],
+      },
     },
   },
   plugins: [],
