@@ -437,7 +437,6 @@ const CropperModal = ({ image, onCropComplete, onClose }) => {
 
 const ProfileHeader = ({ profile, trips, onProfileUpdate }) => {
   const { token, user } = useAuth();
-  console.log("Current user:", user);
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [profileImage, setProfileImage] = useState(
@@ -637,10 +636,6 @@ const UserProfile = () => {
         if (tripsRes.ok) {
           const tripsData = await tripsRes.json();
           setTrips(tripsData);
-
-          // Add this to see what data we're getting back
-          console.log("Trips data:", tripsData);
-          console.log("Current token:", token);
         }
       } catch (error) {
         console.error("Error fetching trips:", error);

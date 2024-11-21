@@ -10,7 +10,6 @@ const AuthProvider = ({ children }) => {
 
   const updateSession = (session) => {
     if (session) {
-      console.log('Raw session:', session);
       // Extract the token
       const token = session.access_token;
       const userId = session.user.id;
@@ -21,7 +20,6 @@ const AuthProvider = ({ children }) => {
       }
 
       // Store the raw token without 'Bearer'
-      console.log('Setting token:', token);
       setToken(token);
       setUser(userId);
       sessionStorage.setItem("sb-access-token", token);
@@ -30,7 +28,6 @@ const AuthProvider = ({ children }) => {
   };
 
   const clearSession = () => {
-    console.log('Clearing session');
     setToken(null);
     setUser(null);
     sessionStorage.removeItem("sb-access-token");
@@ -56,7 +53,6 @@ const AuthProvider = ({ children }) => {
     const initSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        console.log('Full session data:', session);
 
         if (session?.access_token) {
           updateSession(session);
@@ -75,8 +71,6 @@ const AuthProvider = ({ children }) => {
     initSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth event:", event);
-      console.log("Auth session:", session);
 
       if (session?.access_token) {
         updateSession(session);
