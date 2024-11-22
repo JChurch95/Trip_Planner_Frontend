@@ -242,7 +242,7 @@ export default function Home() {
         is_favorite: false,
       };
 
-      const response = await fetch("http://localhost:8000/trips/create", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/trips/create`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

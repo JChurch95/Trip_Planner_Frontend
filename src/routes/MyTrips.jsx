@@ -32,7 +32,7 @@ export default function MyTrips() {
 
   const fetchTrips = async () => {
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const baseUrl = import.meta.env.VITE_API_URL;
       const url = new URL(`${baseUrl}/trips`);
       url.searchParams.set("include_deleted", String(showUnpublished)); // Convert boolean to string
       url.searchParams.set("favorites_only", String(showFavoritesOnly));

@@ -170,13 +170,13 @@ export default function Itinerary() {
         setError(null);
         
         const [detailsResponse, itineraryResponse] = await Promise.all([
-          fetch(`http://localhost:8000/trips/${tripId}/details`, {
+          fetch(`${import.meta.env.VITE_API_URL}/trips/${tripId}/details`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
             }
           }),
-          fetch(`http://localhost:8000/itineraries/${tripId}`, {
+          fetch(`${import.meta.env.VITE_API_URL}/itineraries/${tripId}`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'

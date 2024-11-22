@@ -297,7 +297,7 @@ const QuickPreferences = ({ profile, onUpdate }) => {
     setSaveSuccess(false);
 
     try {
-      const response = await fetch("http://localhost:8000/users/profile", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/profile`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -629,7 +629,7 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const tripsRes = await fetch("http://localhost:8000/trips", {
+        const tripsRes = await fetch(`${import.meta.env.VITE_API_URL}/trips`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

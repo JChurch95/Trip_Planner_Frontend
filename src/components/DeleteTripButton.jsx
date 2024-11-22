@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+
 const DeleteTripButton = ({ tripId, onSuccess, isFavorite }) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     setIsDeleting(true);
     const token = sessionStorage.getItem('sb-access-token');
-    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
     try {
+      const baseUrl = API_URL;
       const response = await fetch(`${baseUrl}/trips/${tripId}`, {
         method: 'DELETE',
         headers: {

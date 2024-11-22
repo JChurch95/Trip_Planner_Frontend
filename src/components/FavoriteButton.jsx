@@ -11,7 +11,7 @@ const FavoriteButton = ({ tripId, initialFavorite = false, onSuccess, destinatio
     console.log('Favorite button clicked', tripId);
     
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const baseUrl = import.meta.env.VITE_API_URL;
       const response = await fetch(`${baseUrl}/trips/${tripId}/favorite`, {
         method: 'POST',
         headers: {
