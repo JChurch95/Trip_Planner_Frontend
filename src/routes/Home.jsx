@@ -237,10 +237,15 @@ export default function Home() {
         dietary_preferences: formData.dietary_preferences || null,
         activity_preferences: formData.activity_preferences || null,
         additional_notes: formData.additional_notes || null,
+        traveler_type: formData.traveler_type || null,
+        activity_level: formData.activity_level || null,
+        budget_preference: formData.budget_preference || null,
         status: "pending",
         is_published: true,
         is_favorite: false,
       };
+
+      console.log('Sending trip data:', tripData);
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/trips/create`, {
         method: "POST",
@@ -251,11 +256,15 @@ export default function Home() {
         body: JSON.stringify(tripData),
       });
 
+      console.log('Response status:', response.status);
+      const responseText = await response.text();
+      console.log('Response data:', responseText);
+
       if (!response.ok) {
-        throw new Error(`Failed to create trip: ${await response.text()}`);
+        throw new Error(`Failed to create trip: ${responseText}`);
       }
 
-      const data = await response.json();
+      const data = JSON.parse(responseText);
       if (data && data.message && data.trip) {
         setShowDetailsModal(false);
         setTimeout(() => {
@@ -268,7 +277,6 @@ export default function Home() {
       setIsCreatingTrip(false);
     }
   };
-
   const filteredLocations = SAMPLE_LOCATIONS.filter((loc) =>
     loc.toLowerCase().includes(searchText.toLowerCase())
   );
