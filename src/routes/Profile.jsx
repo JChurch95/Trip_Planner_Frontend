@@ -299,7 +299,7 @@ const QuickPreferences = ({ profile, onUpdate }) => {
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/users/profile`, {
-        method: "PATCH",
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -498,7 +498,7 @@ const ProfileHeader = ({ profile, trips, onProfileUpdate }) => {
   const handleSaveProfile = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/users/profile`, {
-        method: "PATCH",
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
