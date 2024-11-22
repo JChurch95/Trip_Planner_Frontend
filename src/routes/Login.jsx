@@ -131,7 +131,7 @@ const Login = () => {
         </div>
       </motion.div>
 
-      <h1 className={styles.title}>Welcome Back! Please Sign In</h1>
+      <h1 className={styles.title}>Welcome Back! Hop back in!</h1>
       
       <div className={styles.formContainer}>
         <Form

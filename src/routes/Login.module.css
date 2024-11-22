@@ -1,17 +1,19 @@
 .container {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  background: linear-gradient(to bottom, white, #f9fafb);
+  min-height: 100vh;
+  padding: 1rem;
 }
 
 .title {
+  text-align: center;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
   font-size: 2.5rem;
   font-weight: bold;
-  margin-bottom: 2rem;
   background: linear-gradient(to right, #22c55e, #f97316);
   -webkit-background-clip: text;
   background-clip: text;
