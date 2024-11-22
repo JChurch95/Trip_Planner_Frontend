@@ -265,6 +265,7 @@ const TravelGoals = () => {
     </div>
   );
 };
+
 const QuickPreferences = ({ profile, onUpdate }) => {
   const { token, user } = useAuth();
   const [localPreferences, setLocalPreferences] = useState(() => {
@@ -496,7 +497,7 @@ const ProfileHeader = ({ profile, trips, onProfileUpdate }) => {
 
   const handleSaveProfile = async () => {
     try {
-      const response = await fetch("http://localhost:8000/users/profile", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/profile`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
