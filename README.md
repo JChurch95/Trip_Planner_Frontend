@@ -173,7 +173,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - All contributors and supporters of the project
 
 ## 📧 Contact
-For any queries or support, please reach out to us at support@rabbitroute.com
+For any queries or support, please reach out to me at jordanchurch95@gmail.com
 
 ---
 Built with ❤️ by the Rabbit Route Team
